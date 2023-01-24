@@ -7,8 +7,9 @@ if __name__ == "__main__":
     x = 0
     while x < 10000:
         x+=1
-        print(px.grayscale.get_grayscale_data())
-        print(px.grayscale.get_line_status())
+        gl_list = px.grayscale.get_grayscale_data()
+        print(gl_list)
+        print(px.grayscale.get_line_status(gl_list))
         time.sleep(.2)
 
 
