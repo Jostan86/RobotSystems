@@ -30,8 +30,10 @@ if __name__ == "__main__":
             px.motor_commands.stop()
         elif input_string == "exit":
             print("Farewell\n")
+            time.sleep(1)
         else:
             print("That is not an option!\n")
+            time.sleep(1)
 
 
 
