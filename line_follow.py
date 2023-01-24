@@ -56,25 +56,28 @@ def mapping_func(sensor_reading):
 
 if __name__=='__main__':
     px = Picarx()
-    while True:
-        gm_val_list = px.get_grayscale_data()
-        gm_state = px.get_line_status(gm_val_list)
-        print("gm_val_list: %s, %s"%(gm_val_list, gm_state))
-        if gm_state == "stop":
-            px.stop()
-        elif gm_state == "right":
-            px.set_dir_servo_angle(mapping_func(gm_val_list))
-            px.forward(30)
-        elif gm_state == "left":
-            px.set_dir_servo_angle(mapping_func(gm_val_list))
-            px.forward(30)
-        elif gm_state == "forward":
-            px.set_dir_servo_angle(mapping_func(gm_val_list))
-            px.forward(30)
-        else:
-            px.stop()
-        sleep(.01)
+    try:
 
+        while True:
+            gm_val_list = px.get_grayscale_data()
+            gm_state = px.get_line_status(gm_val_list)
+            print("gm_val_list: %s, %s"%(gm_val_list, gm_state))
+            if gm_state == "stop":
+                px.stop()
+            elif gm_state == "right":
+                px.set_dir_servo_angle(mapping_func(gm_val_list))
+                px.forward(30)
+            elif gm_state == "left":
+                px.set_dir_servo_angle(mapping_func(gm_val_list))
+                px.forward(30)
+            elif gm_state == "forward":
+                px.set_dir_servo_angle(mapping_func(gm_val_list))
+                px.forward(30)
+            else:
+                px.stop()
+            sleep(.01)
+    finally:
+        px.stop()
 
     # try:
     #     while True:
