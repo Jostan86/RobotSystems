@@ -4,7 +4,10 @@ import time
 
 if __name__ == "__main__":
     # try:
+
     px = Picarx()
+    px.set_dir_servo_angle(0)
+    time.sleep(0.5)
     px.forward(40)
     time.sleep(2)
     px.stop()
