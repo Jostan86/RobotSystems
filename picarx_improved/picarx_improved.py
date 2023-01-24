@@ -16,7 +16,7 @@ except ImportError :
            "calls with substitute functions ")
     from sim_robot_hat import *
 
-# from picarx_motor_commands import MotorCommands
+from picax_motor_commands import MotorCommands
 
 logging_format = "%(asctime)s: %(message)s"
 logging.basicConfig(format=logging_format, level=logging.INFO, datefmt="%H:%M:%S")
