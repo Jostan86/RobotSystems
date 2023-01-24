@@ -60,6 +60,8 @@ class MotorCommands(object):
             pin.period(self.PERIOD)
             pin.prescaler(self.PRESCALER)
 
+        atexit.register(self.stop)
+
 
     def set_motor_speed(self,motor,speed):
         # global cali_speed_value,cali_dir_value
@@ -119,7 +121,7 @@ class MotorCommands(object):
     def backward(self,speed):
         axel_length = 117
         axel_seperation = 95
-        atexit.register(self.stop)
+
         current_angle = self.dir_current_angle
         if current_angle != 0:
             abs_current_angle = abs(current_angle)
@@ -140,7 +142,6 @@ class MotorCommands(object):
             self.set_motor_speed(2, speed)  
 
     def forward(self,speed):
-        atexit.register(self.stop)
         current_angle = self.dir_current_angle
         axel_length = 117
         axel_seperation = 95
