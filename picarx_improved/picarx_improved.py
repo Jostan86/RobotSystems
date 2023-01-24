@@ -15,6 +15,7 @@ except ImportError :
     from sim_robot_hat import *
 
 from picax_motor_commands import MotorCommands
+from sim_robot_hat import Grayscale_Module
 
 logging_format = "%(asctime)s: %(message)s"
 logging.basicConfig(format=logging_format, level=logging.INFO, datefmt="%H:%M:%S")
