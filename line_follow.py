@@ -8,7 +8,7 @@
         px.set_grayscale_reference(1400)
 
 '''
-from picarx import Picarx
+from picarx_improved import Picarx
 from time import sleep
 
 
