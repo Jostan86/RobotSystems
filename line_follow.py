@@ -42,8 +42,8 @@ def mapping_func(sensor_reading):
     range_max = 300
     range_min = 100
     range = range_max - range_min
-    diff_left = -(sensor_reading[0] - sensor_reading[1])/range
-    diff_right = (sensor_reading[2] - sensor_reading[1])/range
+    diff_left = (sensor_reading[0] - sensor_reading[1])/range
+    diff_right = -(sensor_reading[2] - sensor_reading[1])/range
 
     steering_scale = (diff_right + diff_left) / 2
     angle = 80 * steering_scale
