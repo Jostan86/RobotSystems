@@ -28,8 +28,10 @@ if __name__ == "__main__":
                 px.motor_commands.backward(40)
             time.sleep(1)
             px.motor_commands.stop()
-        elif input_string != "exit":
-            print("That is not an option")
+        elif input_string == "exit":
+            print("Farewell\n")
+        else:
+            print("That is not an option!\n")
 
 
 
