@@ -239,6 +239,26 @@ class Picarx(object):
     def get_line_status(self,gm_val_list):
         return str(self.grayscale.get_line_status(gm_val_list))
 
+    def forward_distance(self, distance):
+        ...
+
+    def backward_distance(self, distance):
+        ...
+
+    def parallel_park_right(self):
+        self.forward(40)
+        time.sleep(2)
+        self.set_dir_servo_angle(40)
+        time.sleep(0.5)
+        self.backward(40)
+        time.sleep(1.5)
+        self.set_dir_servo_angle(-40)
+        time.sleep(0.5)
+        self.backward(40)
+        time.sleep(1.5)
+
+
+
 
 if __name__ == "__main__":
     px = Picarx()
