@@ -175,12 +175,12 @@ class Picarx(object):
             print("power_scale:",power_scale)
             if (current_angle / abs_current_angle) > 0:
                 print("option 1")
-                self.set_motor_speed(1, -1*speed)
-                self.set_motor_speed(2, speed / power_scale)
+                self.set_motor_speed(1, -1*speed*power_scale)
+                self.set_motor_speed(2, speed)
             else:
                 print("option 2")
-                self.set_motor_speed(1, -1*speed * power_scale)
-                self.set_motor_speed(2, speed )
+                self.set_motor_speed(1, -1*speed)
+                self.set_motor_speed(2, speed / power_scale)
         else:
             self.set_motor_speed(1, -1*speed)
             self.set_motor_speed(2, speed)  
