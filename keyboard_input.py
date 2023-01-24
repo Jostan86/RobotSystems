@@ -9,7 +9,7 @@ if __name__ == "__main__":
         input_string = input("What shall speedy boy do?\nYour options are:\npark-right - Perform a parallel park to the "
                              "right\npark-left - Perform a parallel park to the left\nk-right - Perform a k turn to "
                              "the right\nk-left - Perform a k turn to the left\nforward - Go forward ~30cm\nbackward - "
-                             "Go backward ~30cm\n")
+                             "Go backward ~30cm\nexit - Exit this script\n")
         print("You Chose:" + input_string + "\n")
         if input_string == "park-right":
             px.motor_commands.parallel_park(side="right")
