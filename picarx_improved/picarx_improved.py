@@ -245,20 +245,34 @@ class Picarx(object):
     def backward_distance(self, distance):
         ...
 
-    def parallel_park_right(self):
+    def parallel_park(self, side="right"):
+        self.set_dir_servo_angle(0)
+        time.sleep(0.5)
         self.forward(40)
-        time.sleep(2)
-        self.set_dir_servo_angle(40)
+        time.sleep(1.3)
+        self.stop()
+        if side == "right":
+            self.set_dir_servo_angle(40)
+        else:
+            self.set_dir_servo_angle(-40)
         time.sleep(0.5)
         self.backward(40)
         time.sleep(1.5)
-        self.set_dir_servo_angle(-40)
+        self.stop()
+        if side == "right":
+            self.set_dir_servo_angle(-40)
+        else:
+            self.set_dir_servo_angle(40)
         time.sleep(0.5)
         self.backward(40)
-        time.sleep(1.5)
+        time.sleep(1.3)
+        self.stop()
+        self.set_dir_servo_angle(0)
+        time.sleep(0.5)
+        self.stop()
 
-
-
+    def k_turn(self, dir="left"):
+        ...
 
 if __name__ == "__main__":
     px = Picarx()
