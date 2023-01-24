@@ -3,8 +3,6 @@ import logging
 # from logdecorator import log_on_start , log_on_end , log_on_error
 import os
 import time
-import atexit
-import math
 
 try :
     from robot_hat import *
