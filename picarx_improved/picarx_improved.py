@@ -285,7 +285,7 @@ class Grayscale_Module(object):
         if fl_list[0] > self.reference and fl_list[1] > self.reference and fl_list[2] > self.reference:
             return 'stop'
 
-        elif fl_list[0] <= self.reference:
+        elif fl_list[1] <= self.reference:
             return 'forward'
 
         elif fl_list[0] <= self.reference:
