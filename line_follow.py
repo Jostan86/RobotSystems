@@ -38,6 +38,20 @@ from time import sleep
 #         if currentSta != last_state:
 #             break
 #     sleep(0.001)
+def mapping_func(sensor_reading):
+    range_max = 300
+    range_min = 100
+    range = range_max - range_min
+    diff_left = -(sensor_reading[0] - sensor_reading[1])/range
+    diff_right = (sensor_reading[2] - sensor_reading[1])/range
+
+    steering_scale = (diff_right + diff_left) / 2
+    angle = 80 * steering_scale
+    print(angle)
+    return angle
+
+
+
 
 
 if __name__=='__main__':
@@ -49,12 +63,13 @@ if __name__=='__main__':
         if gm_state == "stop":
             px.stop()
         elif gm_state == "right":
-            px.set_dir_servo_angle(10)
+            px.set_dir_servo_angle(mapping_func(gm_val_list))
             px.forward(30)
         elif gm_state == "left":
-            px.set_dir_servo_angle(-10)
+            px.set_dir_servo_angle(mapping_func(gm_val_list))
             px.forward(30)
         elif gm_state == "forward":
+            px.set_dir_servo_angle(mapping_func(gm_val_list))
             px.forward(30)
         else:
             px.stop()
