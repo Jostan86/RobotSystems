@@ -3,7 +3,7 @@
 # from robot_hat.utils import reset_mcu
 # import time
 import logging
-from logdecorator import log_on_start , log_on_end , log_on_error
+# from logdecorator import log_on_start , log_on_end , log_on_error
 import os
 import math
 #
@@ -182,18 +182,29 @@ class Picarx(object):
     def forward(self,speed):
         atexit.register(self.stop)
         current_angle = self.dir_current_angle
+        axel_length = 117
+        axel_seperation = 95
         if current_angle != 0:
             abs_current_angle = abs(current_angle)
             # if abs_current_angle >= 0:
             if abs_current_angle > 40:
                 abs_current_angle = 40
+
             # power_scale = (100 - abs_current_angle) / 100.0
-            power_scale = math.tan(current_angle)**2
+
             # print("power_scale:",power_scale)
+            power_scale = (axel_length/math.tan(math.radians(current_angle)) - axel_seperation/2) / (axel_length/math.tan(math.radians(current_angle)) + axel_seperation/2)
+            # print(current_angle)
+            # print(math.tan(math.radians(current_angle)))
+            print(power_scale)
 
             if (current_angle / abs_current_angle) > 0:
-                self.set_motor_speed(1, speed - (speed*power_scale))
+                self.set_motor_speed(1, speed * power_scale)
                 self.set_motor_speed(2, -speed)
+            else:
+                self.set_motor_speed(1, speed)
+                self.set_motor_speed(2, -speed * power_scale)
+
             #     # self.set_motor_speed(1, 1*speed * power_scale)
             #     # self.set_motor_speed(2, -speed)
             #     # print("current_speed: %s %s"%(1*speed * power_scale, -speed))
