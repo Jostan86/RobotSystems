@@ -26,7 +26,7 @@ if __name__ == "__main__":
                 px.motor_commands.forward(40)
             else:
                 px.motor_commands.backward(40)
-            time.sleep(1.35)
+            time.sleep(1.3)
             px.motor_commands.stop()
         elif input_string == "exit":
             print("Farewell\n")
