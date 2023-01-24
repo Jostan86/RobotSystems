@@ -66,13 +66,13 @@ if __name__=='__main__':
                 px.stop()
             elif gm_state == "right":
                 px.set_dir_servo_angle(mapping_func(gm_val_list))
-                px.forward(30)
+                px.forward(50)
             elif gm_state == "left":
                 px.set_dir_servo_angle(mapping_func(gm_val_list))
-                px.forward(30)
+                px.forward(50)
             elif gm_state == "forward":
                 px.set_dir_servo_angle(mapping_func(gm_val_list))
-                px.forward(30)
+                px.forward(50)
             else:
                 px.stop()
             sleep(.01)
