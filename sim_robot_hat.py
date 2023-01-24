@@ -817,16 +817,16 @@ class Grayscale_Module(object):
     def get_line_status(self, fl_list):
 
         if fl_list[0] > self.reference and fl_list[1] > self.reference and fl_list[2] > self.reference:
-            return 'stop'
+            return 'stop1'
 
         elif fl_list[1] <= self.reference:
-            return 'forward'
+            return 'forward1'
 
         elif fl_list[0] <= self.reference:
-            return 'right'
+            return 'right1'
 
         elif fl_list[2] <= self.reference:
-            return 'left'
+            return 'left1'
 
     def get_grayscale_data(self):
         adc_value_list = []
