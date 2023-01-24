@@ -6,9 +6,9 @@ import time
 import atexit
 try :
     from robot_hat import *
-    from robot_hat import reset_mcu
-    reset_mcu()
-    time.sleep (0.2)
+    # from robot_hat import reset_mcu
+    # reset_mcu()
+    # time.sleep (0.2)
 except ImportError :
     print (" This computer does not appear to be a PiCar - X system ( robot_hat is not present ) . Shadowing hardware "
            "calls with substitute functions ")
@@ -26,7 +26,7 @@ UserHome = os.popen('getent passwd %s | cut -d: -f 6'%User).readline().strip()
 config_file = '%s/.config/picar-x/picar-x.conf'%UserHome
 
 
-class motor_commands(object):
+class MotorCommands(object):
     PERIOD = 4095
     PRESCALER = 10
     TIMEOUT = 0.02
@@ -189,18 +189,6 @@ class motor_commands(object):
         self.set_motor_speed(1, 0)
         self.set_motor_speed(2, 0)
 
-    def get_distance(self):
-        return self.ultrasonic.read()
-
-    def set_grayscale_reference(self, value):
-        self.get_grayscale_reference = value
-        
-    def get_grayscale_data(self):
-        return list.copy(self.grayscale.get_grayscale_data())
-
-    def get_line_status(self,gm_val_list):
-        return str(self.grayscale.get_line_status(gm_val_list))
-
     def forward_distance(self, distance):
         ...
 
@@ -234,31 +222,27 @@ class motor_commands(object):
         self.stop()
 
     def k_turn(self, dir="left"):
-        px = Picarx()
-        if dir=="left":
-            px.set_dir_servo_angle(-30)
-        else:
-            px.set_dir_servo_angle(30)
-        time.sleep(0.5)
-        px.forward(50)
-        time.sleep(1.6)
-        px.stop()
-        if dir=="left":
-            px.set_dir_servo_angle(30)
-        else:
-            px.set_dir_servo_angle(-30)
-        time.sleep(0.5)
-        px.backward(50)
-        time.sleep(1.6)
-        px.stop()
-        px.set_dir_servo_angle(0)
-        time.sleep(0.5)
-        px.forward(40)
-        time.sleep(.8)
-        px.stop()
 
-if __name__ == "__main__":
-    px = Picarx()
-    px.forward(50)
-    time.sleep(1)
-    px.stop()
+        if dir=="left":
+            self.set_dir_servo_angle(-30)
+        else:
+            self.set_dir_servo_angle(30)
+        time.sleep(0.5)
+        self.forward(50)
+        time.sleep(1.6)
+        self.stop()
+        if dir=="left":
+            self.set_dir_servo_angle(30)
+        else:
+            self.set_dir_servo_angle(-30)
+        time.sleep(0.5)
+        self.backward(50)
+        time.sleep(1.6)
+        self.stop()
+        self.set_dir_servo_angle(0)
+        time.sleep(0.5)
+        self.forward(40)
+        time.sleep(.8)
+        self.stop()
+
+

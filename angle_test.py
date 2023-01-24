@@ -5,7 +5,7 @@ import time
 if __name__ == "__main__":
     # try:
     px = Picarx()
-    px.parallel_park(side="right")
+    px.motor_commands.parallel_park(side="right")
 
 
     # for angle in range(0,35):
