@@ -6,12 +6,12 @@ if __name__ == "__main__":
     # try:
 
     px = Picarx()
-    px.set_dir_servo_angle(-35)
+    px.set_dir_servo_angle(-30)
     time.sleep(0.5)
     px.forward(50)
     time.sleep(1.3)
     px.stop()
-    px.set_dir_servo_angle(35)
+    px.set_dir_servo_angle(30)
     time.sleep(0.5)
     px.backward(50)
     time.sleep(1.5)
