@@ -6,22 +6,23 @@ if __name__ == "__main__":
     px = Picarx()
     input_string = None
     while input_string != "exit":
-        input_string = input("What shall speedy boy do? Your options are:\npark-right - Perform a parallel park to the "
+        input_string = input("What shall speedy boy do?\nYour options are:\npark-right - Perform a parallel park to the "
                              "right\npark-left - Perform a parallel park to the left\nk-right - Perform a k turn to "
                              "the right\nk-left - Perform a k turn to the left\nforward - Go forward ~30cm\nbackward - "
-                             "Go backward ~30cm")
-        if input == "park-right":
+                             "Go backward ~30cm\n")
+        print("You Chose:" + input_string + "\n")
+        if input_string == "park-right":
             px.motor_commands.parallel_park(side="right")
-        elif input == "park-left":
+        elif input_string == "park-left":
             px.motor_commands.parallel_park(side="left")
-        elif input == "k-right":
+        elif input_string == "k-right":
             px.motor_commands.k_turn(dir="right")
-        elif input == "k-left":
+        elif input_string == "k-left":
             px.motor_commands.k_turn(dir="left")
-        elif input == "forward" or input == "backward":
+        elif input_string == "forward" or input_string == "backward":
             px.motor_commands.set_dir_servo_angle(0)
             time.sleep(0.3)
-            if input == "forward":
+            if input_string == "forward":
                 px.motor_commands.forward(40)
             else:
                 px.motor_commands.backward(40)
