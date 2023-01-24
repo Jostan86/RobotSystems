@@ -6,9 +6,6 @@ import time
 import atexit
 try :
     from robot_hat import *
-    # from robot_hat import reset_mcu
-    # reset_mcu()
-    # time.sleep (0.2)
 except ImportError :
     print (" This computer does not appear to be a PiCar - X system ( robot_hat is not present ) . Shadowing hardware "
            "calls with substitute functions ")
@@ -21,8 +18,6 @@ logging.getLogger().setLevel(logging.DEBUG)
 # user and User home directory
 User = os.popen('echo ${SUDO_USER:-$LOGNAME}').readline().strip()
 UserHome = os.popen('getent passwd %s | cut -d: -f 6'%User).readline().strip()
-# print(User)  # pi
-# print(UserHome) # /home/pi
 config_file = '%s/.config/picar-x/picar-x.conf'%UserHome
 
 
@@ -134,9 +129,7 @@ class MotorCommands(object):
             # power_scale = (100 - abs_current_angle) / 100.0
             power_scale = (axel_length / math.tan(math.radians(current_angle)) - axel_seperation / 2) / (
                         axel_length / math.tan(math.radians(current_angle)) + axel_seperation / 2)
-            print("power_scale:",power_scale)
             if (current_angle / abs_current_angle) > 0:
-                print("option 1")
                 self.set_motor_speed(1, -1*speed*power_scale)
                 self.set_motor_speed(2, speed)
             else:
@@ -157,13 +150,7 @@ class MotorCommands(object):
             if abs_current_angle > 40:
                 abs_current_angle = 40
 
-            # power_scale = (100 - abs_current_angle) / 100.0
-
-            # print("power_scale:",power_scale)
             power_scale = (axel_length/math.tan(math.radians(current_angle)) - axel_seperation/2) / (axel_length/math.tan(math.radians(current_angle)) + axel_seperation/2)
-            # print(current_angle)
-            # print(math.tan(math.radians(current_angle)))
-            print(power_scale)
 
             if (current_angle / abs_current_angle) > 0:
 
@@ -172,15 +159,6 @@ class MotorCommands(object):
             else:
                 self.set_motor_speed(1, speed)
                 self.set_motor_speed(2, -speed / power_scale)
-
-            #     # self.set_motor_speed(1, 1*speed * power_scale)
-            #     # self.set_motor_speed(2, -speed)
-            #     # print("current_speed: %s %s"%(1*speed * power_scale, -speed))
-            # else:
-            #
-            #     # self.set_motor_speed(1, speed)
-            #     # self.set_motor_speed(2, -1*speed * power_scale)
-            #     # print("current_speed: %s %s"%(speed, -1*speed * power_scale))
         else:
             self.set_motor_speed(1, speed)
             self.set_motor_speed(2, -1*speed)                  
