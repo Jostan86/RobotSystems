@@ -289,10 +289,10 @@ class Grayscale_Module(object):
             return 'forward'
 
         elif fl_list[0] <= self.reference:
-            return 'right'
+            return 'left'
 
         elif fl_list[2] <= self.reference:
-            return 'left'
+            return 'right'
 
     def get_grayscale_data(self):
         adc_value_list = []
