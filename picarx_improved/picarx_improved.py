@@ -73,7 +73,7 @@ class Picarx(object):
         # grayscale module init
         # usage: self.grayscale.get_grayscale_data()
         adc0, adc1, adc2 = grayscale_pins
-        self.grayscale = Grayscale_Module(adc0, adc1, adc2, reference=1000)
+        self.grayscale = Grayscale_Module(adc0, adc1, adc2, reference=200)
         # ultrasonic init
         # usage: distance = self.ultrasonic.read()
         tring, echo= ultrasonic_pins
@@ -274,7 +274,7 @@ class Picarx(object):
         ...
 
 class Grayscale_Module(object):
-    def __init__(self, pin0, pin1, pin2, reference=1000):
+    def __init__(self, pin0, pin1, pin2, reference=200):
         self.chn_0 = ADC(pin0)
         self.chn_1 = ADC(pin1)
         self.chn_2 = ADC(pin2)
@@ -283,16 +283,16 @@ class Grayscale_Module(object):
     def get_line_status(self, fl_list):
 
         if fl_list[0] > self.reference and fl_list[1] > self.reference and fl_list[2] > self.reference:
-            return 'stop2'
-
-        elif fl_list[1] <= self.reference:
-            return 'forward2'
+            return 'stop'
 
         elif fl_list[0] <= self.reference:
-            return 'right2'
+            return 'forward'
+
+        elif fl_list[0] <= self.reference:
+            return 'right'
 
         elif fl_list[2] <= self.reference:
-            return 'left2'
+            return 'left'
 
     def get_grayscale_data(self):
         adc_value_list = []
