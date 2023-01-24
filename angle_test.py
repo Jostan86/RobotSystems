@@ -5,9 +5,7 @@ import time
 if __name__ == "__main__":
     # try:
     px = Picarx()
-    px.set_dir_servo_angle(-30)
-    px.forward(30)
-    time.sleep(3)
+    px.parallel_park(side="right")
 
 
     # for angle in range(0,35):
