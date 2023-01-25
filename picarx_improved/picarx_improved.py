@@ -14,8 +14,6 @@ except ImportError :
            "calls with substitute functions ")
     from sim_robot_hat import *
 
-# from picax_motor_commands import MotorCommands
-# from sim_robot_hat import Grayscale_Module
 
 logging_format = "%(asctime)s: %(message)s"
 logging.basicConfig(format=logging_format, level=logging.INFO, datefmt="%H:%M:%S")
@@ -126,6 +124,7 @@ class Picarx(object):
         self.dir_servo_pin.angle(value)
 
     def set_dir_servo_angle(self,value):
+        # Positive turns to right, negative turns to left
         self.dir_current_angle = value
         angle_value  = value + self.dir_cal_value
         self.dir_servo_pin.angle(angle_value)
@@ -141,10 +140,9 @@ class Picarx(object):
         current_angle = self.dir_current_angle
         if current_angle != 0:
             abs_current_angle = abs(current_angle)
-            # if abs_current_angle >= 0:
             if abs_current_angle > 40:
                 abs_current_angle = 40
-            # power_scale = (100 - abs_current_angle) / 100.0
+            # Power scale is ratio of turning radii for each of the rear wheels
             power_scale = (axel_length / math.tan(math.radians(current_angle)) - axel_seperation / 2) / (
                         axel_length / math.tan(math.radians(current_angle)) + axel_seperation / 2)
             if (current_angle / abs_current_angle) > 0:
@@ -163,11 +161,11 @@ class Picarx(object):
         axel_seperation = 95
         if current_angle != 0:
             abs_current_angle = abs(current_angle)
-            # if abs_current_angle >= 0:
             if abs_current_angle > 40:
                 abs_current_angle = 40
-
-            power_scale = (axel_length/math.tan(math.radians(current_angle)) - axel_seperation/2) / (axel_length/math.tan(math.radians(current_angle)) + axel_seperation/2)
+            # Power scale is ratio of turning radii for each of the rear wheels
+            power_scale = (axel_length/math.tan(math.radians(current_angle)) - axel_seperation/2) / (
+                    axel_length/math.tan(math.radians(current_angle)) + axel_seperation/2)
 
             if (current_angle / abs_current_angle) > 0:
 
@@ -185,12 +183,15 @@ class Picarx(object):
         self.set_motor_speed(2, 0)
 
     def forward_distance(self, distance):
+        # Move forward a given distance in mm
         ...
 
     def backward_distance(self, distance):
+        # Move backward a given distance in mm
         ...
 
     def parallel_park(self, side="right"):
+        # Parallel park the car to the left or right.
         self.set_dir_servo_angle(0)
         time.sleep(0.5)
         self.forward(40)
@@ -217,7 +218,7 @@ class Picarx(object):
         self.stop()
 
     def k_turn(self, dir="left"):
-
+        # Do a k turn, with the first turn being to the left or right
         if dir=="left":
             self.set_dir_servo_angle(-30)
         else:
@@ -266,12 +267,6 @@ class Picarx(object):
 
     def get_line_status(self,gm_val_list):
         return str(self.grayscale.get_line_status(gm_val_list))
-
-    def forward_distance(self, distance):
-        ...
-
-    def backward_distance(self, distance):
-        ...
 
 class Grayscale_Module(object):
     def __init__(self, pin0, pin1, pin2, reference=200):
