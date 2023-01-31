@@ -62,16 +62,35 @@ class CV_Line_Follow_Interpreter:
 
             for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
                 img = frame.array
-                img, img_2, img_3 = self.color_detect(img, 'red')  # Color detection function
-                cv2.imshow("video", img)  # OpenCV image show
-                cv2.imshow("mask", img_2)  # OpenCV image show
-                cv2.imshow("morphologyEx_img", img_3)  # OpenCV image show
-                rawCapture.truncate(0)  # Release cache
+                # img, img_2, img_3 = self.color_detect(img, 'red')  # Color detection function
+                # cv2.imshow("video", img)  # OpenCV image show
+                # cv2.imshow("mask", img_2)  # OpenCV image show
+                # cv2.imshow("morphologyEx_img", img_3)  # OpenCV image show
+                # rawCapture.truncate(0)  # Release cache
+                #
+                # k = cv2.waitKey(1) & 0xFF
+                # # 27 is the ESC key, which means that if you press the ESC key to exit
+                # if k == 27:
+                #     break
+                # Convert the image to grayscale
+                gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-                k = cv2.waitKey(1) & 0xFF
-                # 27 is the ESC key, which means that if you press the ESC key to exit
-                if k == 27:
-                    break
+                # Threshold the grayscale image to get only black pixels
+                _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+
+                # Find edges using Canny
+                edges = cv2.Canny(thresh, 100, 200)
+
+                # Perform Hough Transform on the edges
+                lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 50, maxLineGap=50)
+
+                # Draw lines on the image
+                for line in lines:
+                    x1, y1, x2, y2 = line[0]
+                    cv2.line(img, (x1, y1), (x2, y2), (0, 0, 255), 2)
+
+                # Show the result
+                cv2.imshow('lines', img)
 
             print('quit ...')
             cv2.destroyAllWindows()
