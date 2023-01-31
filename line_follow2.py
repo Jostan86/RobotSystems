@@ -153,11 +153,11 @@ class CV_Line_Follow_Interpreter:
 
                     cy = int(M['m01'] / M['m00'])
 
-                    cv2.line(crop_img, (cx, 0), (cx, 720), (255, 0, 0), 1)
+                    cv2.line(img, (cx, 0), (cx, 720), (255, 0, 0), 1)
 
-                    cv2.line(crop_img, (0, cy), (1280, cy), (255, 0, 0), 1)
+                    cv2.line(img, (0, cy), (1280, cy), (255, 0, 0), 1)
 
-                    cv2.drawContours(crop_img, contours, -1, (0, 255, 0), 1)
+                    cv2.drawContours(img, contours, -1, (0, 255, 0), 1)
 
                     if cx >= 120:
                         print("Turn Left!")
