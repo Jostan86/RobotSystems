@@ -13,6 +13,7 @@ from time import sleep
 
 class GS_Line_Follow_Interpereter:
     def __init__(self, px, sensitivity=300, line_darker=True):
+        self.stop_threshold = 50
         self.px = px
         self.sensitivity = sensitivity
         if line_darker:
@@ -20,7 +21,7 @@ class GS_Line_Follow_Interpereter:
         else:
             self.polarity = -1
     def stop_check (self, sensor_reading):
-        if abs(sensor_reading[0] - sensor_reading[1]) < 30 and abs(sensor_reading[2] - sensor_reading[1]) < 30:
+        if abs(sensor_reading[0] - sensor_reading[1]) < self.stop_threshold and abs(sensor_reading[2] - sensor_reading[1]) < self.stop_threshold:
 
             return True
         else:
@@ -45,7 +46,7 @@ class GS_Line_Follow_Interpereter:
         steering_scale = diff_right + diff_left
         angle = 25 * steering_scale
         print(angle)
-        return angle
+        px.set_dir_servo_angle(angle)
 
     def follow_line(self):
         try:
