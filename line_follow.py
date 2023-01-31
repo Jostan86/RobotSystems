@@ -13,8 +13,8 @@ from time import sleep
 
 def mapping_func(sensor_readings):
 
-    range_max = 400
-    range_min = 120
+    range_max = 450
+    range_min = 150
     range = range_max - range_min
     for sensor_num, sensor_reading in enumerate(sensor_readings):
         if sensor_reading > range_max:
