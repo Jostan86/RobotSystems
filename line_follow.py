@@ -27,7 +27,7 @@ class GS_Line_Follow_Interpereter:
         else:
             return False
 
-    def set_wheel_angle(self, sensor_readings):
+    def get_direction(self, sensor_readings):
 
         range_max = max(sensor_readings)
         range_min = range_max - self.sensitivity
@@ -44,10 +44,9 @@ class GS_Line_Follow_Interpereter:
         diff_right = self.polarity * (-(sensor_readings[2] - sensor_readings[1])/self.sensitivity)
 
         steering_scale = diff_right + diff_left
-        angle = 25 * steering_scale
-        print(steering_scale)
-        # print(angle)
-        px.set_dir_servo_angle(angle)
+        return steering_scale
+
+
 
     def follow_line(self):
         try:
@@ -58,21 +57,9 @@ class GS_Line_Follow_Interpereter:
                 if self.stop_check(sensor_readings):
                     self.px.stop()
                 else:
-                    self.set_wheel_angle(sensor_readings)
+                    px.set_dir_servo_angle(25 * self.get_direction(sensor_readings))
                     px.forward(40)
-                # if gm_state == "stop":
-                #     px.stop()
-                # elif gm_state == "right":
-                #     px.set_dir_servo_angle(GS_Line_Follow_Interpereter.mapping_func(gm_val_list))
-                #     px.forward(50)
-                # elif gm_state == "left":
-                #     px.set_dir_servo_angle(GS_Line_Follow_Interpereter.mapping_func(gm_val_list))
-                #     px.forward(50)
-                # elif gm_state == "forward":
-                #     px.set_dir_servo_angle(GS_Line_Follow_Interpereter.mapping_func(gm_val_list))
-                #     px.forward(50)
-                # else:
-                #     px.stop()
+
                 sleep(.01)
         finally:
             px.stop()
