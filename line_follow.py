@@ -46,7 +46,7 @@ class GS_Line_Follow_Interpereter:
         steering_scale = diff_right + diff_left
         angle = 25 * steering_scale
         print(steering_scale)
-        print(angle)
+        # print(angle)
         px.set_dir_servo_angle(angle)
 
     def follow_line(self):
