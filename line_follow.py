@@ -62,6 +62,8 @@ class CV_Line_Follow_Interpreter:
 
             for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
                 img = frame.array
+                height = img.shape[0]
+                img = img[int(height/4):,:]
                 # img, img_2, img_3 = self.color_detect(img, 'red')  # Color detection function
                 # cv2.imshow("video", img)  # OpenCV image show
                 # cv2.imshow("mask", img_2)  # OpenCV image show
@@ -95,22 +97,47 @@ class CV_Line_Follow_Interpreter:
 
                 # Define a range of black color in HSV
                 lower_black = np.array([0, 0, 0])
-                upper_black = np.array([180, 255, 30])
+                upper_black = np.array([180, 255, 40])
 
                 # Threshold the HSV image to get only black pixels
                 mask = cv2.inRange(hsv, lower_black, upper_black)
 
                 # Find edges using Canny
-                edges = cv2.Canny(mask, 100, 200)
+                edges = cv2.Canny(mask, 200, 400)
 
                 # Perform Hough Transform on the edges
-                lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 50, maxLineGap=50)
+                lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 25, maxLineGap=10, minLineLength=50)
+                #lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 50, maxLineGap=20, minLineLength=200)
+                
 
+                save_fit = []
                 # Draw lines on the image
-                for line in lines:
-                    x1, y1, x2, y2 = line[0]
-                    cv2.line(img, (x1, y1), (x2, y2), (0, 0, 255), 2)
-
+                if lines is not None:
+                    for line in lines:
+                        x1, y1, x2, y2 = line[0]
+                        if x1 == x2:
+                            pass
+                        fit = np.polyfit((x1, x2), (y1, y2), 1)
+                        slope = fit[0]
+                        intercept = fit[1]
+                        save_fit.append((slope, intercept))
+                        cv2.line(img, (x1, y1), (x2, y2), (0, 0, 255), 2)
+                        
+                    fit_average = np.average(save_fit, axis=0)
+                    if len(save_fit) > 0:
+                        #lane_lines.append(make_points(img, fit_average)
+                        
+                        height, width, _ = img.shape
+                        slope, intercept = fit_average
+                        y1 = height
+                        y2 = 0
+                        x1 = max(-width, min(2 * width, int((y1-intercept)/slope)))
+                        x2 = max(-width, min(2 * width, int((y2-intercept)/slope)))
+                        
+                        cv2.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                    
+                    
+                    
                 # Show the result
                 cv2.imshow('lines', img)
                 cv2.imshow('mask', mask)
@@ -150,7 +177,7 @@ class CV_Line_Follow_Interpreter:
                                             iterations=1)  # Perform an open operation on the image
 
         # Find the contour in morphologyEx_img, and the contours are arranged according to the area from small to large.
-        _tuple = cv2.findContours(morphologyEx_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        _tuple = cv2.findContours(morphologyEx_img, cv2.REdeTR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         # compatible with opencv3.x and openc4.x
         if len(_tuple) == 3:
             _, contours, hierarchy = _tuple
@@ -197,6 +224,7 @@ class Line_Follow_Controller:
 
 if __name__=='__main__':
     px = Picarx()
+    px.set_camera_servo2_angle(-35)
     camera = CV_Line_Follow_Interpreter()
     # interpreter = GS_Line_Follow_Interpereter(px)
     # controller = Line_Follow_Controller(px, interpreter)
