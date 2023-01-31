@@ -72,6 +72,8 @@ class CV_Line_Follow_Interpreter:
                 # # 27 is the ESC key, which means that if you press the ESC key to exit
                 # if k == 27:
                 #     break
+
+
                 # Convert the image to grayscale
                 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -91,6 +93,12 @@ class CV_Line_Follow_Interpreter:
 
                 # Show the result
                 cv2.imshow('lines', gray)
+                rawCapture.truncate(0)  # Release cache
+
+                k = cv2.waitKey(1) & 0xFF
+                # 27 is the ESC key, which means that if you press the ESC key to exit
+                if k == 27:
+                    break
 
             print('quit ...')
             cv2.destroyAllWindows()
