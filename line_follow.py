@@ -113,6 +113,7 @@ class CV_Line_Follow_Interpreter:
 
                 # Show the result
                 cv2.imshow('lines', img)
+                cv2.imshow('mask', mask)
                 rawCapture.truncate(0)  # Release cache
 
                 k = cv2.waitKey(1) & 0xFF
