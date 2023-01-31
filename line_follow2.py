@@ -170,9 +170,9 @@ class CV_Line_Follow_Interpreter:
 
 
 
-            else:
+                else:
 
-                print("I don't see the line")
+                    print("I don't see the line")
 
 
                 # Show the result
