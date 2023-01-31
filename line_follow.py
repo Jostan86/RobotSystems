@@ -11,19 +11,19 @@
 from picarx_improved import Picarx
 from time import sleep
 
-def mapping_func(sensor_reading):
+def mapping_func(sensor_readings):
 
     range_max = 400
     range_min = 120
     range = range_max - range_min
-    for sensor_num, sensor_reading in enumerate(sensor_reading):
+    for sensor_num, sensor_reading in enumerate(sensor_readings):
         if sensor_reading > range_max:
-            sensor_reading[sensor_num] = range_max
+            sensor_readings[sensor_num] = range_max
         if sensor_reading < range_min:
-            sensor_reading[sensor_num] = range_min
+            sensor_readings[sensor_num] = range_min
 
-    diff_left = (sensor_reading[0] - sensor_reading[1])/range
-    diff_right = -(sensor_reading[2] - sensor_reading[1])/range
+    diff_left = (sensor_readings[0] - sensor_readings[1])/range
+    diff_right = -(sensor_readings[2] - sensor_readings[1])/range
 
     steering_scale = (diff_right + diff_left) / 2
     angle = 80 * steering_scale
