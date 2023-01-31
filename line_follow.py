@@ -49,7 +49,6 @@ class GS_Line_Follow_Interpereter:
 
     def follow_line(self):
         try:
-
             while True:
                 sensor_readings = px.get_grayscale_data()
                 # gm_state = px.get_line_status(gm_val_list)
