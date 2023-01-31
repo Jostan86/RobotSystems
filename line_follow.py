@@ -12,6 +12,7 @@ from picarx_improved import Picarx
 from time import sleep
 
 def mapping_func(sensor_reading):
+
     range_max = 400
     range_min = 120
     range = range_max - range_min
