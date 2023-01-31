@@ -74,14 +74,34 @@ class CV_Line_Follow_Interpreter:
                 #     break
 
 
-                # Convert the image to grayscale
-                gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                # # Convert the image to grayscale
+                # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                #
+                # # Threshold the grayscale image to get only black pixels
+                # _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+                #
+                # # Find edges using Canny
+                # edges = cv2.Canny(thresh, 100, 200)
+                #
+                # # Perform Hough Transform on the edges
+                # lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 50, maxLineGap=50)
+                #
+                # # Draw lines on the image
+                # for line in lines:
+                #     x1, y1, x2, y2 = line[0]
+                #     cv2.line(img, (x1, y1), (x2, y2), (0, 0, 255), 2)
+                # Convert the image to HSV color space
+                hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-                # Threshold the grayscale image to get only black pixels
-                _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+                # Define a range of black color in HSV
+                lower_black = np.array([0, 0, 0])
+                upper_black = np.array([180, 255, 30])
+
+                # Threshold the HSV image to get only black pixels
+                mask = cv2.inRange(hsv, lower_black, upper_black)
 
                 # Find edges using Canny
-                edges = cv2.Canny(thresh, 100, 200)
+                edges = cv2.Canny(mask, 100, 200)
 
                 # Perform Hough Transform on the edges
                 lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 50, maxLineGap=50)
