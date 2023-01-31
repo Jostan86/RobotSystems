@@ -46,18 +46,18 @@ class GS_Line_Follow_Interpereter:
         steering_scale = diff_right + diff_left
         return steering_scale
 
-
-
+class Line_Follow_Controller:
+    def __init__(self, px, interpreter):
+        self.px = px
+        self.interpreter = interpreter
     def follow_line(self):
         try:
             while True:
                 sensor_readings = px.get_grayscale_data()
-                # gm_state = px.get_line_status(gm_val_list)
-                # print("gm_val_list: %s, %s" % (gm_val_list, gm_state))
-                if self.stop_check(sensor_readings):
+                if interpreter.stop_check(sensor_readings):
                     self.px.stop()
                 else:
-                    px.set_dir_servo_angle(25 * self.get_direction(sensor_readings))
+                    px.set_dir_servo_angle(25 * interpreter.get_direction(sensor_readings))
                     px.forward(40)
 
                 sleep(.01)
@@ -65,36 +65,10 @@ class GS_Line_Follow_Interpereter:
             px.stop()
 
 
-
-
-
-
-
 if __name__=='__main__':
     px = Picarx()
     interpreter = GS_Line_Follow_Interpereter(px)
-    interpreter.follow_line()
-    # px.set_grayscale_reference(200)
-    # try:
-    #
-    #     while True:
-    #         gm_val_list = px.get_grayscale_data()
-    #         gm_state = px.get_line_status(gm_val_list)
-    #         print("gm_val_list: %s, %s"%(gm_val_list, gm_state))
-    #         if gm_state == "stop":
-    #             px.stop()
-    #         elif gm_state == "right":
-    #             px.set_dir_servo_angle(GS_Line_Follow_Interpereter.mapping_func(gm_val_list))
-    #             px.forward(50)
-    #         elif gm_state == "left":
-    #             px.set_dir_servo_angle(GS_Line_Follow_Interpereter.mapping_func(gm_val_list))
-    #             px.forward(50)
-    #         elif gm_state == "forward":
-    #             px.set_dir_servo_angle(GS_Line_Follow_Interpereter.mapping_func(gm_val_list))
-    #             px.forward(50)
-    #         else:
-    #             px.stop()
-    #         sleep(.01)
-    # finally:
-    #     px.stop()
+    controller = Line_Follow_Controller(px, interpreter)
+    controller.follow_line()
+
 
