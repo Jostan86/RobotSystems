@@ -13,7 +13,7 @@ from time import sleep
 
 class GS_Line_Follow_Interpereter:
     def __init__(self, px, sensitivity=300, line_darker=True):
-        self.stop_threshold = 50
+        self.stop_threshold = 100
         self.px = px
         self.sensitivity = sensitivity
         if line_darker:
