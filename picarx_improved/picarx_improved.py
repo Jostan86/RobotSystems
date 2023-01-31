@@ -266,7 +266,7 @@ class Picarx(object):
         return list.copy(self.grayscale.get_grayscale_data())
 
     def get_line_status(self,gm_val_list):
-        if gm_val_list[0] > self.grayscale.reference and gm_val_list[1] > self.grayscale.reference and gm_val_list[2] > self.reference:
+        if gm_val_list[0] > self.grayscale.reference and gm_val_list[1] > self.grayscale.reference and gm_val_list[2] > self.grayscale.reference:
             return 'stop'
 
         elif gm_val_list[1] <= self.grayscale.reference:
