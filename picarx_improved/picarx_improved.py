@@ -140,8 +140,8 @@ class Picarx(object):
         current_angle = self.dir_current_angle
         if current_angle != 0:
             abs_current_angle = abs(current_angle)
-            if abs_current_angle > 40:
-                abs_current_angle = 40
+            if abs_current_angle > 25:
+                abs_current_angle = 25
             # Power scale is ratio of turning radii for each of the rear wheels
             power_scale = (axel_length / math.tan(math.radians(current_angle)) - axel_seperation / 2) / (
                         axel_length / math.tan(math.radians(current_angle)) + axel_seperation / 2)
@@ -161,8 +161,8 @@ class Picarx(object):
         axel_seperation = 95
         if current_angle != 0:
             abs_current_angle = abs(current_angle)
-            if abs_current_angle > 40:
-                abs_current_angle = 40
+            if abs_current_angle > 25:
+                abs_current_angle = 25
             # Power scale is ratio of turning radii for each of the rear wheels
             power_scale = (axel_length/math.tan(math.radians(current_angle)) - axel_seperation/2) / (
                     axel_length/math.tan(math.radians(current_angle)) + axel_seperation/2)
@@ -278,34 +278,6 @@ class Picarx(object):
         elif gm_val_list[2] <= self.grayscale.reference:
             return 'right'
 
-
-# class Grayscale_Module(object):
-#     def __init__(self, pin0, pin1, pin2, reference=200):
-#         self.chn_0 = ADC(pin0)
-#         self.chn_1 = ADC(pin1)
-#         self.chn_2 = ADC(pin2)
-#         self.reference = reference
-#
-#     def get_line_status(self, fl_list):
-#
-#         if fl_list[0] > self.reference and fl_list[1] > self.reference and fl_list[2] > self.reference:
-#             return 'stop'
-#
-#         elif fl_list[1] <= self.reference:
-#             return 'forward'
-#
-#         elif fl_list[0] <= self.reference:
-#             return 'left'
-#
-#         elif fl_list[2] <= self.reference:
-#             return 'right'
-#
-#     def get_grayscale_data(self):
-#         adc_value_list = []
-#         adc_value_list.append(self.chn_0.read())
-#         adc_value_list.append(self.chn_1.read())
-#         adc_value_list.append(self.chn_2.read())
-#         return adc_value_list
 
 if __name__ == "__main__":
     px = Picarx()
