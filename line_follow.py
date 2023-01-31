@@ -155,10 +155,10 @@ class Line_Follow_Controller:
         try:
             while True:
                 sensor_readings = px.get_grayscale_data()
-                if interpreter.stop_check(sensor_readings):
+                if self.interpreter.stop_check(sensor_readings):
                     self.px.stop()
                 else:
-                    px.set_dir_servo_angle(25 * interpreter.get_direction(sensor_readings))
+                    px.set_dir_servo_angle(25 * self.interpreter.get_direction(sensor_readings))
                     px.forward(40)
 
                 sleep(.01)
@@ -168,8 +168,10 @@ class Line_Follow_Controller:
 
 if __name__=='__main__':
     px = Picarx()
-    interpreter = GS_Line_Follow_Interpereter(px)
-    controller = Line_Follow_Controller(px, interpreter)
-    controller.follow_line()
+    camera = CV_Line_Follow_Interpreter()
+    # interpreter = GS_Line_Follow_Interpereter(px)
+    # controller = Line_Follow_Controller(px, interpreter)
+    # controller.follow_line()
+
 
 
