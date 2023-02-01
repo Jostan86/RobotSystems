@@ -336,25 +336,17 @@ if __name__=='__main__':
         #     cv2.circle(img, midpoint, 5, (255, 0, 0), -1)
         # print(is_single_blob(binary, 100))
 
+
         # Setup SimpleBlobDetector parameters.
-        params = cv2.SimpleBlobDetector_Params()
 
-        # Change thresholds
-        params.minThreshold = 0
-        params.maxThreshold = 255
-
-        # Filter by Area.
-        params.filterByArea = True
-        params.minArea = 500
-        params.maxArea = 500000
-        detector = cv2.SimpleBlobDetector_create(params)
-
-        keypoints = detector.detect(cv2.bitwise_not(binary))
-        im_with_keypoints = cv2.drawKeypoints(img, keypoints, np.array([]), (0, 0, 255),
-                                              cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+        # Get the connected components
+        num_components, labels, stats, centroids = cv2.connectedComponentsWithStats((255 - binary), 4, cv2.CV_32S)
+        for i in range(1, num_components):
+            x, y, w, h, size = stats[i]
+            cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
 
         # cv2.imshow("og", img)
-        cv2.imshow("Keypoints", im_with_keypoints)
+        cv2.imshow("Keypoints", img)
         cv2.imshow("Line Detection", binary)
 
         # Clear the stream in preparation for the next frame

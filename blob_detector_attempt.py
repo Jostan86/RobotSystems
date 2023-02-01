@@ -4,44 +4,20 @@ import numpy as np
 import time
 # Read image
 im = cv2.imread("img2.png", cv2.IMREAD_GRAYSCALE)
-im = cv2.bitwise_not(im)
+_, im = cv2.threshold(im, 100, 255, cv2.THRESH_BINARY_INV)
+im = 255-im
 # Setup SimpleBlobDetector parameters.
-params = cv2.SimpleBlobDetector_Params()
 
-# Change thresholds
-params.minThreshold = 0
-params.maxThreshold = 255
 
-# Filter by Area.
-params.filterByArea = True
-params.minArea = 100
-params.maxArea = 5000000
 
-# # Filter by Circularity
-params.filterByCircularity = False
-# params.minCircularity = 0.1
-
-# Filter by Convexity
-params.filterByConvexity = False
-# params.minConvexity = 0.87
-
-# Filter by Inertia
-params.filterByInertia = False
-# params.minInertiaRatio = 0.01
-
-# Create a detector with the parameters
-ver = (cv2.__version__).split('.')
-if int(ver[0]) < 3:
-    detector = cv2.SimpleBlobDetector(params)
-else:
-    detector = cv2.SimpleBlobDetector_create(params)
-# Show keypoints
-keypoints = detector.detect(im)
-
-im_with_keypoints = cv2.drawKeypoints(im, keypoints, np.array([]), (0,0,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+# Get the connected components
+num_components, labels, stats, centroids = cv2.connectedComponentsWithStats(im, 4, cv2.CV_32S)
+for i in range(1, num_components):
+    x, y, w, h, size = stats[i]
+    cv2.rectangle(im, (x, y), (x + w, y + h), (255, 0, 0), 2)
 
 while True:
-    cv2.imshow("Keypoints", im_with_keypoints)
+    cv2.imshow("Keypoints", im)
     # cv2.waitKey(0)
 
     k = cv2.waitKey(1) & 0xFF
