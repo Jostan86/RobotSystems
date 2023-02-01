@@ -276,24 +276,25 @@ def is_line_present(segment, threshold):
     if mask_sum / (segment.shape[0] * segment.shape[1] * 255) < threshold:
         return False
     return True
+def is_single_blob(segment, threshold=200):
+    kernel_open = np.ones((3, 3), np.uint8)
+    kernel_close = np.ones((10, 10), np.uint8)
+    segment = cv2.morphologyEx(segment, cv2.MORPH_OPEN, kernel_open)
+    segment = cv2.morphologyEx(segment, cv2.MORPH_CLOSE, kernel_close)
+    num_components, labels, stats, centroids = cv2.connectedComponentsWithStats(segment, 8, cv2.CV_32S)
 
-# def is_one_blob(segment, k):
-#     """Check if there is only one blob of mask."""
-#     nonzero_pixels = np.transpose(np.nonzero(segment))
-#     kmeans = KMeans(n_clusters=k)
-#     kmeans.fit(nonzero_pixels)
-#     labels = kmeans.labels_
-#     return len(set(labels)) == 1
+    num_components_using = 0
+    for i in range(1, num_components):
+        x, y, w, h, size = stats[i]
 
-def is_single_blob(segment, threshold=10):
-    params = cv2.SimpleBlobDetector_Params()
-    params.minThreshold = 0
-    params.maxThreshold = 255
-    params.filterByArea = True
-    params.minArea = threshold
-    detector = cv2.SimpleBlobDetector_create(params)
-    keypoints = detector.detect(segment)
-    return len(keypoints) == 1
+        if size > threshold:
+            num_components_using += 1
+
+        # cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
+        # cv2.circle(img, (int(centroids[i][0]), int(centroids[i][1])), 4, (0, 0, 255), -1)
+    if num_components_using > 1:
+        return False
+    return True
 
 if __name__=='__main__':
     px = Picarx()
@@ -315,46 +316,32 @@ if __name__=='__main__':
         _, binary = cv2.threshold(gray, 60, 255, cv2.THRESH_BINARY_INV)
 
 
-        # num_segments = 6
-        # contains_line_threshold = 0.05
-        # contains_line_threshold_k = 1
-        #
-        # # Get the height and width of the image
-        # height, width = img.shape[:2]
-        #
-        # segment_height = height // num_segments
-        #
-        # for i in range(num_segments):
-        #     segment = binary[i * segment_height: (i + 1) * segment_height, :]
-        #     if not is_line_present(segment, contains_line_threshold) or not is_one_blob(segment, contains_line_threshold_k):
-        #         midpoint = None
-        #         continue
-        #     midpoint = find_2d_midpoint(segment)
-        #     if midpoint is not None:
-        #         midpoint[1] += int(i * (1/num_segments) * height)
-        #
-        #     cv2.circle(img, midpoint, 5, (255, 0, 0), -1)
-        # print(is_single_blob(binary, 100))
+        num_segments = 6
+        contains_line_threshold = 0.05
+        remove_blob_size = 200
+
+        # Get the height and width of the image
+        height, width = img.shape[:2]
+
+        segment_height = height // num_segments
+
+        for i in range(num_segments):
+            segment = binary[i * segment_height: (i + 1) * segment_height, :]
+            if not is_line_present(segment, contains_line_threshold) or not is_single_blob(segment, threshold=remove_blob_size):
+                midpoint = None
+                continue
+            midpoint = find_2d_midpoint(segment)
+            if midpoint is not None:
+                midpoint[1] += int(i * (1/num_segments) * height)
+
+            cv2.circle(img, midpoint, 5, (255, 0, 0), -1)
 
 
-        # Setup SimpleBlobDetector parameters.
 
-        # Get the connected components
-        # binary = 255 - binary
         kernel_open = np.ones((3, 3), np.uint8)
         kernel_close = np.ones((10, 10), np.uint8)
-        binary1 = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel_open)
-        binary2 = cv2.morphologyEx(binary1, cv2.MORPH_CLOSE, kernel_close)
-        num_components, labels, stats, centroids = cv2.connectedComponentsWithStats(binary2, 4, cv2.CV_32S)
-
-        for i in range(1, num_components):
-            x, y, w, h, size = stats[i]
-
-            if size < 200:
-                continue
-            print(stats[i])
-            cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
-            cv2.circle(img, (int(centroids[i][0]), int(centroids[i][1])), 4, (0, 0, 255), -1)
+        binary2 = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel_open)
+        binary2 = cv2.morphologyEx(binary2, cv2.MORPH_CLOSE, kernel_close)
 
         # cv2.imshow("og", img)
         cv2.imshow("OG", img)
