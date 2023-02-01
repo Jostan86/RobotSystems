@@ -15,6 +15,7 @@ from picamera.array import PiRGBArray
 from picamera import PiCamera
 import numpy as np
 import time
+from sklearn.cluster import KMeans
 
 class GS_Line_Follow_Interpereter:
     def __init__(self, px, sensitivity=300, line_darker=True):
@@ -258,13 +259,7 @@ class Line_Follow_Controller:
         finally:
             px.stop()
 
-# def find_midpoint(segment):
-#     nonzero_cols = np.nonzero(np.sum(segment, axis=0))[0]
-#     if len(nonzero_cols) == 0:
-#         return None
-#     x_coords = np.arange(segment.shape[1])[nonzero_cols]
-#     weights = np.sum(segment[:,nonzero_cols], axis=0)
-#     return int(np.average(x_coords, weights=weights))
+
 def find_2d_midpoint(segment):
 
     nonzero_rows, nonzero_cols = np.nonzero(segment)
@@ -275,6 +270,20 @@ def find_2d_midpoint(segment):
     weights = segment[nonzero_rows, nonzero_cols]
     return [int(np.average(x_coords, weights=weights)), int(np.average(y_coords, weights=weights))]
 
+def is_line_present(segment, threshold):
+    """Check if there is at least some minimum amount of line seen in the segment."""
+    mask_sum = np.sum(segment)
+    if mask_sum / (segment.shape[0] * segment.shape[1]) < threshold:
+        return False
+    return True
+
+def is_one_blob(segment, k):
+    """Check if there is only one blob of mask."""
+    nonzero_pixels = np.transpose(np.nonzero(segment))
+    kmeans = KMeans(n_clusters=k)
+    kmeans.fit(nonzero_pixels)
+    labels = kmeans.labels_
+    return len(set(labels)) == 1
 
 if __name__=='__main__':
     px = Picarx()
@@ -297,6 +306,8 @@ if __name__=='__main__':
 
 
         num_segments = 6
+        contains_line_threshold = 0.05
+        contains_line_threshold_k = 1
 
         # Get the height and width of the image
         height, width = img.shape[:2]
@@ -305,38 +316,15 @@ if __name__=='__main__':
 
         for i in range(num_segments):
             segment = binary[i * segment_height: (i + 1) * segment_height, :]
+            if not is_line_present(segment, contains_line_threshold) or not is_one_blob(segment, contains_line_threshold_k):
+                midpoint = None
+                continue
             midpoint = find_2d_midpoint(segment)
             if midpoint is not None:
                 midpoint[1] += int(i * (1/num_segments) * height)
 
             cv2.circle(img, midpoint, 5, (255, 0, 0), -1)
             # cv2.imshow(f"Segment {i + 1}", segment)
-
-
-        # segment1 = binary[0:segment_height, :]
-        # segment2 = binary[segment_height:2 * segment_height, :]
-        # segment3 = binary[2 * segment_height:3 * segment_height, :]
-        # segment4 = binary[3 * segment_height:, :]
-        #
-        #
-        # midpoint1 = find_2d_midpoint(segment1)
-        # midpoint2 = find_2d_midpoint(segment2)
-        # midpoint3 = find_2d_midpoint(segment3)
-        # midpoint4 = find_2d_midpoint(segment4)
-        # height = img.shape[0]
-        # if midpoint2 is not None:
-        #     midpoint2[1] += int(0.25 * height)
-        # if midpoint3 is not None:
-        #     midpoint3[1] += int(0.5 * height)
-        # if midpoint4 is not None:
-        #     midpoint4[1] += int(0.75 * height)
-        # cv2.circle(img, midpoint1, 5, (255, 0, 0), -1)
-        # cv2.circle(img, midpoint2, 5, (255, 0, 0), -1)
-        # cv2.circle(img, midpoint3, 5, (255, 0, 0), -1)
-        # cv2.circle(img, midpoint4, 5, (255, 0, 0), -1)
-
-
-
 
 
         # Show the image
