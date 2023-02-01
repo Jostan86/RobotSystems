@@ -340,14 +340,19 @@ if __name__=='__main__':
         # Setup SimpleBlobDetector parameters.
 
         # Get the connected components
-        num_components, labels, stats, centroids = cv2.connectedComponentsWithStats((255 - binary), 4, cv2.CV_32S)
+        binary = 255 - binary
+        kernel = np.ones((10, 10), np.uint8)
+        binary2 = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
+        num_components, labels, stats, centroids = cv2.connectedComponentsWithStats(binary2, 4, cv2.CV_32S)
         for i in range(1, num_components):
             x, y, w, h, size = stats[i]
             cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
+            cv2.circle(img, (int(centroids[i][0]), int(centroids[i][1])), 4, (0, 0, 255), -1)
 
         # cv2.imshow("og", img)
         cv2.imshow("Keypoints", img)
         cv2.imshow("Line Detection", binary)
+        cv2.imshow("Line Detection", binary2)
 
         # Clear the stream in preparation for the next frame
         rawCapture.truncate(0)
