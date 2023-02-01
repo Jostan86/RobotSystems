@@ -346,6 +346,7 @@ if __name__=='__main__':
         # Filter by Area.
         params.filterByArea = True
         params.minArea = 500
+        params.maxArea = 500000
         detector = cv2.SimpleBlobDetector_create(params)
 
         keypoints = detector.detect(cv2.bitwise_not(img))
