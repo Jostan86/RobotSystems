@@ -258,15 +258,9 @@ class Line_Follow_Controller:
         finally:
             px.stop()
 def find_midpoint(segment):
-    column_sums = np.sum(segment, axis=0)
-    for sum in column_sums:
-        print(sum)
-    nonzero_cols = np.nonzero(column_sums)[0]
-    x_coords = nonzero_cols
-    print(nonzero_cols)
-
-    weights = column_sums[nonzero_cols]
-    print(weights)
+    nonzero_cols = np.nonzero(np.sum(segment, axis=0))[0]
+    x_coords = np.arange(segment.shape[1])[nonzero_cols]
+    weights = np.sum(segment[:,nonzero_cols], axis=0)
     return int(np.average(x_coords, weights=weights))
 
 if __name__=='__main__':
@@ -283,10 +277,10 @@ if __name__=='__main__':
         img = frame.array
         height = img.shape[0]
         img = img[int(height/4):,:]
-        # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         #
         # # Apply thresholding to make the line black and the background white
-        # _, binary = cv2.threshold(gray, 60, 255, cv2.THRESH_BINARY_INV)
+        _, binary = cv2.threshold(gray, 60, 255, cv2.THRESH_BINARY_INV)
         #
         # # Find the edges of the line using the Canny edge detection algorithm
         # edges = cv2.Canny(binary, 50, 150)
@@ -327,10 +321,10 @@ if __name__=='__main__':
         #     cv2.imshow(f"Segment {i + 1}", segment)
         # Split the image into four segments
         segment_height = img.shape[0] // 4
-        segment1 = img[0:segment_height, :]
-        segment2 = img[segment_height:2 * segment_height, :]
-        segment3 = img[2 * segment_height:3 * segment_height, :]
-        segment4 = img[3 * segment_height:, :]
+        segment1 = binary[0:segment_height, :]
+        segment2 = binary[segment_height:2 * segment_height, :]
+        segment3 = binary[2 * segment_height:3 * segment_height, :]
+        segment4 = binary[3 * segment_height:, :]
 
 
         # Find the midpoint of the black line in each segment
