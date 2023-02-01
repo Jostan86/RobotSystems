@@ -270,34 +270,47 @@ if __name__=='__main__':
     # Capture frames from the camera
     for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
         # Convert the frame to grayscale
-        gray = cv2.cvtColor(frame.array, cv2.COLOR_BGR2GRAY)
+        img = frame.array
+        height = img.shape[0]
+        img = img[int(height/4):,:]
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
         # Apply thresholding to make the line black and the background white
-        _, binary = cv2.threshold(gray, 50, 255, cv2.THRESH_BINARY_INV)
+        _, binary = cv2.threshold(gray, 60, 255, cv2.THRESH_BINARY_INV)
 
-        # # Find the edges of the line using the Canny edge detection algorithm
-        # edges = cv2.Canny(binary, 50, 150)
+        # Find the edges of the line using the Canny edge detection algorithm
+        edges = cv2.Canny(binary, 50, 150)
         #
+        # Detect lines using the Hough lines algorithm
+        lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 30, np.empty(1), minLineLength=30, maxLineGap=10)
+        
+        if lines is not None:
+        #  Draw the lines on the image
+           for line in lines:
+               x1, y1, x2, y2 = line[0]
+               cv2.line(img, (x1, y1), (x2, y2), (0, 0, 255), 2)
         # # Detect lines using the Hough lines algorithm
-        # lines = cv2.HoughLines(edges, 1, np.pi / 180, 50)
-        #
+        # lines = cv2.HoughLines(edges, 1, np.pi / 180, 30)
+        
         # if lines is not None:
-        #     # Draw the lines on the image
-        #     for line in lines:
-        #         rho, theta = line[0]
-        #         a = np.cos(theta)
-        #         b = np.sin(theta)
-        #         x0 = a * rho
-        #         y0 = b * rho
-        #         x1 = int(x0 + 1000 * (-b))
-        #         y1 = int(y0 + 1000 * (a))
-        #         x2 = int(x0 - 1000 * (-b))
-        #         y2 = int(y0 - 1000 * (a))
-        #         cv2.line(frame.array, (x1, y1), (x2, y2), (0, 0, 255), 2)
+            # # Draw the lines on the image
+            # for i in range(0, len(lines)):
+                # rho = lines[i][0][0]
+                # theta = lines[i][0][1]
+                # a = np.cos(theta)
+                # b = np.sin(theta)
+                # x0 = a * rho
+                # y0 = b * rho
+                # x1 = int(x0 + 1000 * (-b))
+                # y1 = int(y0 + 1000 * (a))
+                # x2 = int(x0 - 1000 * (-b))
+                # y2 = int(y0 - 1000 * (a))
+                # cv2.line(img, (x1, y1), (x2, y2), (0, 0, 255), 2)
 
         # Show the image
         # cv2.imshow("Line Detection", frame.array)
-        cv2.imshow("Line Detection", binary)
+        cv2.imshow("og", img)
+        cv2.imshow("Line Detection", edges)
 
         # Clear the stream in preparation for the next frame
         rawCapture.truncate(0)
