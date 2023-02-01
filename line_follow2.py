@@ -258,10 +258,14 @@ class Line_Follow_Controller:
         finally:
             px.stop()
 def find_midpoint(segment):
-    nonzero_rows = np.nonzero(np.sum(segment, axis=1))[0]
-    y_coords = np.arange(segment.shape[0])[nonzero_rows]
-    weights = np.sum(segment[nonzero_rows,:], axis=1)
-    return int(np.average(y_coords, weights=weights))
+    column_sums = np.sum(segment, axis=0)
+    nonzero_cols = np.nonzero(column_sums)[0]
+    x_coords = nonzero_cols
+    print(x_coords)
+
+    weights = column_sums[nonzero_cols]
+    print(weights)
+    return int(np.average(x_coords, weights=weights))
 
 if __name__=='__main__':
     px = Picarx()
