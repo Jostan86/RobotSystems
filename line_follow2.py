@@ -257,13 +257,24 @@ class Line_Follow_Controller:
                 sleep(.01)
         finally:
             px.stop()
-def find_midpoint(segment):
-    nonzero_cols = np.nonzero(np.sum(segment, axis=0))[0]
-    if len(nonzero_cols) == 0:
+
+# def find_midpoint(segment):
+#     nonzero_cols = np.nonzero(np.sum(segment, axis=0))[0]
+#     if len(nonzero_cols) == 0:
+#         return None
+#     x_coords = np.arange(segment.shape[1])[nonzero_cols]
+#     weights = np.sum(segment[:,nonzero_cols], axis=0)
+#     return int(np.average(x_coords, weights=weights))
+def find_2d_midpoint(segment):
+
+    nonzero_rows, nonzero_cols = np.nonzero(segment)
+    if len(nonzero_cols) == 0 or len(nonzero_rows) == 0:
         return None
     x_coords = np.arange(segment.shape[1])[nonzero_cols]
-    weights = np.sum(segment[:,nonzero_cols], axis=0)
-    return int(np.average(x_coords, weights=weights))
+    y_coords = np.arange(segment.shape[0])[nonzero_rows]
+    weights = segment[nonzero_rows, nonzero_cols]
+    return (int(np.average(x_coords, weights=weights)), int(np.average(y_coords, weights=weights)))
+
 
 if __name__=='__main__':
     px = Picarx()
@@ -340,15 +351,15 @@ if __name__=='__main__':
 
 
 
-        midpoint1 = find_midpoint(segment1)
-        midpoint2 = find_midpoint(segment2)
-        midpoint3 = find_midpoint(segment3)
-        midpoint4 = find_midpoint(segment4)
+        midpoint1 = find_2d_midpoint(segment1)
+        midpoint2 = find_2d_midpoint(segment2)
+        midpoint3 = find_2d_midpoint(segment3)
+        midpoint4 = find_2d_midpoint(segment4)
         height = img.shape[0]
-        cv2.circle(img, (midpoint1, int(0.12 * height)), 5, (255, 0, 0), -1)
-        cv2.circle(img, (midpoint2, int(0.37 * height)), 5, (255, 0, 0), -1)
-        cv2.circle(img, (midpoint3, int(0.62 * height)), 5, (255, 0, 0), -1)
-        cv2.circle(img, (midpoint4, int(0.87 * height)), 5, (255, 0, 0), -1)
+        cv2.circle(img, midpoint1, 5, (255, 0, 0), -1)
+        cv2.circle(img, midpoint2, 5, (255, 0, 0), -1)
+        cv2.circle(img, midpoint3, 5, (255, 0, 0), -1)
+        cv2.circle(img, midpoint4, 5, (255, 0, 0), -1)
 
 
 
