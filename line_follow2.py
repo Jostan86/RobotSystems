@@ -273,7 +273,7 @@ def find_2d_midpoint(segment):
     x_coords = np.arange(segment.shape[1])[nonzero_cols]
     y_coords = np.arange(segment.shape[0])[nonzero_rows]
     weights = segment[nonzero_rows, nonzero_cols]
-    return (int(np.average(x_coords, weights=weights)), int(np.average(y_coords, weights=weights)))
+    return [int(np.average(x_coords, weights=weights)), int(np.average(y_coords, weights=weights))]
 
 
 if __name__=='__main__':
@@ -356,6 +356,9 @@ if __name__=='__main__':
         midpoint3 = find_2d_midpoint(segment3)
         midpoint4 = find_2d_midpoint(segment4)
         height = img.shape[0]
+        midpoint2[1] += int(0.25 * height)
+        midpoint3[1] += int(0.5 * height)
+        midpoint4[1] += int(0.75 * height)
         cv2.circle(img, midpoint1, 5, (255, 0, 0), -1)
         cv2.circle(img, midpoint2, 5, (255, 0, 0), -1)
         cv2.circle(img, midpoint3, 5, (255, 0, 0), -1)
