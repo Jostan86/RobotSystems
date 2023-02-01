@@ -271,8 +271,8 @@ if __name__=='__main__':
     for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
         # Convert the frame to grayscale
         img = frame.array
-        # height = img.shape[0]
-        # img = img[int(height/4):,:]
+        height = img.shape[0]
+        img = img[int(height/4):,:]
         # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         #
         # # Apply thresholding to make the line black and the background white
@@ -297,6 +297,23 @@ if __name__=='__main__':
         for i in range(4):
             segment = img[i * segment_height: (i + 1) * segment_height, :]
             # Do something with the segment, such as processing or displaying
+            gray = cv2.cvtColor(segment, cv2.COLOR_BGR2GRAY)
+
+            # Apply thresholding to make the line black and the background white
+            _, binary = cv2.threshold(gray, 60, 255, cv2.THRESH_BINARY_INV)
+
+            # Find the edges of the line using the Canny edge detection algorithm
+            edges = cv2.Canny(binary, 50, 150)
+            #
+            # Detect lines using the Hough lines algorithm
+            lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 30, np.empty(1), minLineLength=30, maxLineGap=10)
+
+            if lines is not None:
+            #  Draw the lines on the image
+               for line in lines:
+                   x1, y1, x2, y2 = line[0]
+                   cv2.line(segment, (x1, y1), (x2, y2), (0, 0, 255), 2)
+            # Get the height and width of the image
             cv2.imshow(f"Segment {i + 1}", segment)
 
 
