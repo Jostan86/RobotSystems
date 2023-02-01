@@ -273,18 +273,27 @@ def find_2d_midpoint(segment):
 def is_line_present(segment, threshold):
     """Check if there is at least some minimum amount of line seen in the segment."""
     mask_sum = np.sum(segment)
-    print(mask_sum / (segment.shape[0] * segment.shape[1] * 255))
     if mask_sum / (segment.shape[0] * segment.shape[1] * 255) < threshold:
         return False
     return True
 
-def is_one_blob(segment, k):
-    """Check if there is only one blob of mask."""
-    nonzero_pixels = np.transpose(np.nonzero(segment))
-    kmeans = KMeans(n_clusters=k)
-    kmeans.fit(nonzero_pixels)
-    labels = kmeans.labels_
-    return len(set(labels)) == 1
+# def is_one_blob(segment, k):
+#     """Check if there is only one blob of mask."""
+#     nonzero_pixels = np.transpose(np.nonzero(segment))
+#     kmeans = KMeans(n_clusters=k)
+#     kmeans.fit(nonzero_pixels)
+#     labels = kmeans.labels_
+#     return len(set(labels)) == 1
+
+def is_single_blob(segment, threshold=10):
+    params = cv2.SimpleBlobDetector_Params()
+    params.minThreshold = 0
+    params.maxThreshold = 255
+    params.filterByArea = True
+    params.minArea = threshold
+    detector = cv2.SimpleBlobDetector_create(params)
+    keypoints = detector.detect(segment)
+    return len(keypoints) == 1
 
 if __name__=='__main__':
     px = Picarx()
@@ -306,30 +315,31 @@ if __name__=='__main__':
         _, binary = cv2.threshold(gray, 60, 255, cv2.THRESH_BINARY_INV)
 
 
-        num_segments = 6
-        contains_line_threshold = 0.05
-        contains_line_threshold_k = 1
+        # num_segments = 6
+        # contains_line_threshold = 0.05
+        # contains_line_threshold_k = 1
+        #
+        # # Get the height and width of the image
+        # height, width = img.shape[:2]
+        #
+        # segment_height = height // num_segments
+        #
+        # for i in range(num_segments):
+        #     segment = binary[i * segment_height: (i + 1) * segment_height, :]
+        #     if not is_line_present(segment, contains_line_threshold) or not is_one_blob(segment, contains_line_threshold_k):
+        #         midpoint = None
+        #         continue
+        #     midpoint = find_2d_midpoint(segment)
+        #     if midpoint is not None:
+        #         midpoint[1] += int(i * (1/num_segments) * height)
+        #
+        #     cv2.circle(img, midpoint, 5, (255, 0, 0), -1)
+        print(is_single_blob(binary, 100))
 
-        # Get the height and width of the image
-        height, width = img.shape[:2]
-
-        segment_height = height // num_segments
-
-        for i in range(num_segments):
-            segment = binary[i * segment_height: (i + 1) * segment_height, :]
-            if not is_line_present(segment, contains_line_threshold) or not is_one_blob(segment, contains_line_threshold_k):
-                midpoint = None
-                continue
-            midpoint = find_2d_midpoint(segment)
-            if midpoint is not None:
-                midpoint[1] += int(i * (1/num_segments) * height)
-
-            cv2.circle(img, midpoint, 5, (255, 0, 0), -1)
-            # cv2.imshow(f"Segment {i + 1}", segment)
 
 
-        # Show the image
-        # cv2.imshow("Line Detection", frame.array)
+
+
         cv2.imshow("og", img)
         cv2.imshow("Line Detection", binary)
 
