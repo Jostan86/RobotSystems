@@ -334,9 +334,20 @@ if __name__=='__main__':
         #         midpoint[1] += int(i * (1/num_segments) * height)
         #
         #     cv2.circle(img, midpoint, 5, (255, 0, 0), -1)
-        print(is_single_blob(binary, 100))
+        # print(is_single_blob(binary, 100))
 
-        detector = cv2.SimpleBlobDetector()
+        # Setup SimpleBlobDetector parameters.
+        params = cv2.SimpleBlobDetector_Params()
+
+        # Change thresholds
+        params.minThreshold = 0
+        params.maxThreshold = 255
+
+        # Filter by Area.
+        params.filterByArea = True
+        params.minArea = 500
+        detector = cv2.SimpleBlobDetector_create(params)
+
         keypoints = detector.detect(img)
         im_with_keypoints = cv2.drawKeypoints(img, keypoints, np.array([]), (0, 0, 255),
                                               cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
