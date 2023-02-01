@@ -340,7 +340,7 @@ if __name__=='__main__':
         # Setup SimpleBlobDetector parameters.
 
         # Get the connected components
-        binary = 255 - binary
+        # binary = 255 - binary
         kernel = np.ones((10, 10), np.uint8)
         binary2 = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
         num_components, labels, stats, centroids = cv2.connectedComponentsWithStats(binary2, 4, cv2.CV_32S)
