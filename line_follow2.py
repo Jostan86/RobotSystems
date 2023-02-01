@@ -273,7 +273,7 @@ if __name__=='__main__':
         gray = cv2.cvtColor(frame.array, cv2.COLOR_BGR2GRAY)
 
         # Apply thresholding to make the line black and the background white
-        _, binary = cv2.threshold(gray, 128, 255, cv2.THRESH_BINARY_INV)
+        _, binary = cv2.threshold(gray, 50, 255, cv2.THRESH_BINARY_INV)
 
         # # Find the edges of the line using the Canny edge detection algorithm
         # edges = cv2.Canny(binary, 50, 150)
