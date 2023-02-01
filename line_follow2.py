@@ -353,10 +353,11 @@ if __name__=='__main__':
 
 
 
+
         # Show the image
         # cv2.imshow("Line Detection", frame.array)
         cv2.imshow("og", img)
-        # cv2.imshow("Line Detection", edges)
+        cv2.imshow("Line Detection", binary)
 
         # Clear the stream in preparation for the next frame
         rawCapture.truncate(0)
