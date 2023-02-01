@@ -346,7 +346,7 @@ if __name__=='__main__':
         binary1 = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel_open)
         binary2 = cv2.morphologyEx(binary1, cv2.MORPH_CLOSE, kernel_close)
         num_components, labels, stats, centroids = cv2.connectedComponentsWithStats(binary2, 4, cv2.CV_32S)
-        print(num_components)
+        print(stats)
         for i in range(1, num_components):
             x, y, w, h, size = stats[i]
             cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
