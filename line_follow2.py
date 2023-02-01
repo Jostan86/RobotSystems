@@ -324,13 +324,19 @@ if __name__=='__main__':
 
 
         # Find the midpoint of the black line in each segment
+        # def find_midpoint(segment):
+        #     nonzero_cols = np.nonzero(np.sum(segment, axis=0))[0]
+        #     if len(nonzero_cols) == 0:
+        #         return None
+        #     x_coords = np.arange(segment.shape[1])[nonzero_cols]
+        #     weights = np.sum(segment[:, nonzero_cols], axis=0)
+        #     return int(np.average(x_coords, weights=weights, axis=1))
         def find_midpoint(segment):
-            nonzero_cols = np.nonzero(np.sum(segment, axis=0))[0]
-            if len(nonzero_cols) == 0:
-                return None
-            x_coords = np.arange(segment.shape[1])[nonzero_cols]
-            weights = np.sum(segment[:, nonzero_cols], axis=0)
-            return int(np.average(x_coords, weights=weights, axis=1))
+            column_sums = np.sum(segment, axis=0)
+            nonzero_cols = np.nonzero(column_sums)[0]
+            x_coords = nonzero_cols
+            weights = column_sums[nonzero_cols]
+            return int(np.average(x_coords, weights=weights))
 
 
         midpoint1 = find_midpoint(segment1)
