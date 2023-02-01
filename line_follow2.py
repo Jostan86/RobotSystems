@@ -259,9 +259,11 @@ class Line_Follow_Controller:
             px.stop()
 def find_midpoint(segment):
     column_sums = np.sum(segment, axis=0)
+    for sum in column_sums:
+        print(sum)
     nonzero_cols = np.nonzero(column_sums)[0]
     x_coords = nonzero_cols
-    print(x_coords)
+    print(nonzero_cols)
 
     weights = column_sums[nonzero_cols]
     print(weights)
