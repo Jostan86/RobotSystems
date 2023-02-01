@@ -341,8 +341,8 @@ if __name__=='__main__':
 
         # Get the connected components
         # binary = 255 - binary
-        kernel_open = np.ones((5, 5), np.uint8)
-        kernel_close = np.ones((10, 10), np.uint8)
+        kernel_open = np.ones((3, 3), np.uint8)
+        kernel_close = np.ones((7, 7), np.uint8)
         binary1 = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel_open)
         binary2 = cv2.morphologyEx(binary1, cv2.MORPH_CLOSE, kernel_close)
         num_components, labels, stats, centroids = cv2.connectedComponentsWithStats(binary2, 4, cv2.CV_32S)
