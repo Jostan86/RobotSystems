@@ -343,10 +343,10 @@ if __name__=='__main__':
         midpoint3 = find_midpoint(segment3)
         midpoint4 = find_midpoint(segment4)
 
-        cv2.circle(img, midpoint1, 5, (255, 0, 0), -1)
-        cv2.circle(img, midpoint2, 5, (255, 0, 0), -1)
-        cv2.circle(img, midpoint3, 5, (255, 0, 0), -1)
-        cv2.circle(img, midpoint4, 5, (255, 0, 0), -1)
+        cv2.circle(img, (midpoint1, int(0.12 * height)), 5, (255, 0, 0), -1)
+        cv2.circle(img, (midpoint2, int(0.37 * height)), 5, (255, 0, 0), -1)
+        cv2.circle(img, (midpoint3, int(0.62 * height)), 5, (255, 0, 0), -1)
+        cv2.circle(img, (midpoint4, int(0.87 * height)), 5, (255, 0, 0), -1)
 
 
 
