@@ -3,8 +3,8 @@ import cv2
 import numpy as np
 import time
 # Read image
-im = cv2.imread("img_1.png", cv2.IMREAD_GRAYSCALE)
-
+im = cv2.imread("img2.png", cv2.IMREAD_GRAYSCALE)
+im = cv2.bitwise_not(im)
 # Setup SimpleBlobDetector parameters.
 params = cv2.SimpleBlobDetector_Params()
 
@@ -14,19 +14,19 @@ params.maxThreshold = 255
 
 # Filter by Area.
 params.filterByArea = True
-params.minArea = 1500
+params.minArea = 100
 
 # # Filter by Circularity
-# params.filterByCircularity = True
+params.filterByCircularity = False
 # params.minCircularity = 0.1
 
 # Filter by Convexity
-params.filterByConvexity = True
-params.minConvexity = 0.87
+params.filterByConvexity = False
+# params.minConvexity = 0.87
 
 # Filter by Inertia
-params.filterByInertia = True
-params.minInertiaRatio = 0.01
+params.filterByInertia = False
+# params.minInertiaRatio = 0.01
 
 # Create a detector with the parameters
 ver = (cv2.__version__).split('.')

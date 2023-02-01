@@ -348,7 +348,7 @@ if __name__=='__main__':
         params.minArea = 500
         detector = cv2.SimpleBlobDetector_create(params)
 
-        keypoints = detector.detect(img)
+        keypoints = detector.detect(cv2.bitwise_not(img))
         im_with_keypoints = cv2.drawKeypoints(img, keypoints, np.array([]), (0, 0, 255),
                                               cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
