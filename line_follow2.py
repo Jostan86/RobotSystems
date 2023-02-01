@@ -275,25 +275,25 @@ if __name__=='__main__':
         # Apply thresholding to make the line black and the background white
         _, binary = cv2.threshold(gray, 128, 255, cv2.THRESH_BINARY_INV)
 
-        # Find the edges of the line using the Canny edge detection algorithm
-        edges = cv2.Canny(binary, 50, 150)
-
-        # Detect lines using the Hough lines algorithm
-        lines = cv2.HoughLines(edges, 1, np.pi / 180, 50)
-
-        if lines is not None:
-            # Draw the lines on the image
-            for line in lines:
-                rho, theta = line[0]
-                a = np.cos(theta)
-                b = np.sin(theta)
-                x0 = a * rho
-                y0 = b * rho
-                x1 = int(x0 + 1000 * (-b))
-                y1 = int(y0 + 1000 * (a))
-                x2 = int(x0 - 1000 * (-b))
-                y2 = int(y0 - 1000 * (a))
-                cv2.line(frame.array, (x1, y1), (x2, y2), (0, 0, 255), 2)
+        # # Find the edges of the line using the Canny edge detection algorithm
+        # edges = cv2.Canny(binary, 50, 150)
+        #
+        # # Detect lines using the Hough lines algorithm
+        # lines = cv2.HoughLines(edges, 1, np.pi / 180, 50)
+        #
+        # if lines is not None:
+        #     # Draw the lines on the image
+        #     for line in lines:
+        #         rho, theta = line[0]
+        #         a = np.cos(theta)
+        #         b = np.sin(theta)
+        #         x0 = a * rho
+        #         y0 = b * rho
+        #         x1 = int(x0 + 1000 * (-b))
+        #         y1 = int(y0 + 1000 * (a))
+        #         x2 = int(x0 - 1000 * (-b))
+        #         y2 = int(y0 - 1000 * (a))
+        #         cv2.line(frame.array, (x1, y1), (x2, y2), (0, 0, 255), 2)
 
         # Show the image
         # cv2.imshow("Line Detection", frame.array)
