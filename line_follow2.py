@@ -350,9 +350,9 @@ if __name__=='__main__':
             cv2.circle(img, (int(centroids[i][0]), int(centroids[i][1])), 4, (0, 0, 255), -1)
 
         # cv2.imshow("og", img)
-        cv2.imshow("Keypoints", img)
-        cv2.imshow("Line Detection", binary)
-        cv2.imshow("Line Detection", binary2)
+        cv2.imshow("OG", img)
+        cv2.imshow("binary", binary)
+        cv2.imshow("binary2", binary2)
 
         # Clear the stream in preparation for the next frame
         rawCapture.truncate(0)
