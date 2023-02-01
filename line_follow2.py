@@ -293,8 +293,8 @@ if __name__=='__main__':
         height, width = img.shape[:2]
 
         # Split the image into 4 equal parts
-        segment_height = height // 4
-        for i in range(4):
+        segment_height = height // 3
+        for i in range(3):
             segment = img[i * segment_height: (i + 1) * segment_height, :]
             # Do something with the segment, such as processing or displaying
             gray = cv2.cvtColor(segment, cv2.COLOR_BGR2GRAY)
