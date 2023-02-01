@@ -264,8 +264,9 @@ if __name__=='__main__':
     px.set_camera_servo2_angle(-25)
     camera = PiCamera()
     camera.resolution = (640, 480)
-    camera.framerate = 32
-    rawCapture = PiRGBArray(camera, size=(640, 480))
+    camera.framerate = 24
+    rawCapture = PiRGBArray(camera, size=camera.resolution)
+    time.sleep(2)
     # Capture frames from the camera
     for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
         # Convert the frame to grayscale
@@ -305,9 +306,9 @@ if __name__=='__main__':
         if k == 27:
             break
 
-        print('quit ...')
-        cv2.destroyAllWindows()
-        camera.close()
+    print('quit ...')
+    cv2.destroyAllWindows()
+    camera.close()
 
 
 
