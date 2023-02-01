@@ -224,7 +224,7 @@ class Line_Follow_Controller:
 
 if __name__=='__main__':
     px = Picarx()
-    px.set_camera_servo2_angle(-35)
+    px.set_camera_servo2_angle(-25)
     camera = CV_Line_Follow_Interpreter()
     # interpreter = GS_Line_Follow_Interpereter(px)
     # controller = Line_Follow_Controller(px, interpreter)

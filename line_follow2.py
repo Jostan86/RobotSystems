@@ -261,8 +261,57 @@ class Line_Follow_Controller:
 
 if __name__=='__main__':
     px = Picarx()
-    px.set_camera_servo2_angle(-35)
-    camera = CV_Line_Follow_Interpreter()
+    px.set_camera_servo2_angle(-25)
+    camera = PiCamera()
+    camera.resolution = (640, 480)
+    camera.framerate = 32
+    rawCapture = PiRGBArray(camera, size=(640, 480))
+    # Capture frames from the camera
+    for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
+        # Convert the frame to grayscale
+        gray = cv2.cvtColor(frame.array, cv2.COLOR_BGR2GRAY)
+
+        # Apply thresholding to make the line black and the background white
+        _, binary = cv2.threshold(gray, 128, 255, cv2.THRESH_BINARY_INV)
+
+        # Find the edges of the line using the Canny edge detection algorithm
+        edges = cv2.Canny(binary, 50, 150)
+
+        # Detect lines using the Hough lines algorithm
+        lines = cv2.HoughLines(edges, 1, np.pi / 180, 50)
+
+        # Draw the lines on the image
+        for line in lines:
+            rho, theta = line[0]
+            a = np.cos(theta)
+            b = np.sin(theta)
+            x0 = a * rho
+            y0 = b * rho
+            x1 = int(x0 + 1000 * (-b))
+            y1 = int(y0 + 1000 * (a))
+            x2 = int(x0 - 1000 * (-b))
+            y2 = int(y0 - 1000 * (a))
+            cv2.line(frame.array, (x1, y1), (x2, y2), (0, 0, 255), 2)
+
+        # Show the image
+        cv2.imshow("Line Detection", frame.array)
+
+        # Clear the stream in preparation for the next frame
+        rawCapture.truncate(0)
+
+        k = cv2.waitKey(1) & 0xFF
+        # 27 is the ESC key, which means that if you press the ESC key to exit
+        if k == 27:
+            break
+
+        print('quit ...')
+        cv2.destroyAllWindows()
+        camera.close()
+
+
+
+
+    # camera = CV_Line_Follow_Interpreter()
     # interpreter = GS_Line_Follow_Interpereter(px)
     # controller = Line_Follow_Controller(px, interpreter)
     # controller.follow_line()
