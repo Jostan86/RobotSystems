@@ -290,36 +290,59 @@ if __name__=='__main__':
         #        x1, y1, x2, y2 = line[0]
         #        cv2.line(img, (x1, y1), (x2, y2), (0, 0, 255), 2)
         # Get the height and width of the image
-        height, width = img.shape[:2]
+        # height, width = img.shape[:2]
+        #
+        # # Split the image into 4 equal parts
+        # segment_height = height // 3
+        # for i in range(3):
+        #     segment = img[i * segment_height: (i + 1) * segment_height, :]
+        #     # Do something with the segment, such as processing or displaying
+        #     gray = cv2.cvtColor(segment, cv2.COLOR_BGR2GRAY)
+        #
+        #     # Apply thresholding to make the line black and the background white
+        #     _, binary = cv2.threshold(gray, 60, 255, cv2.THRESH_BINARY_INV)
+        #
+        #     # Find the edges of the line using the Canny edge detection algorithm
+        #     edges = cv2.Canny(binary, 50, 150)
+        #     #
+        #     # Detect lines using the Hough lines algorithm
+        #     lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 30, np.empty(1), minLineLength=30, maxLineGap=10)
+        #
+        #     if lines is not None:
+        #     #  Draw the lines on the image
+        #        for line in lines:
+        #            x1, y1, x2, y2 = line[0]
+        #            cv2.line(segment, (x1, y1), (x2, y2), (0, 0, 255), 2)
+        #     # Get the height and width of the image
+        #     cv2.imshow(f"Segment {i + 1}", segment)
+        # Split the image into four segments
+        segment_height = img.shape[0] // 4
+        segment1 = img[0:segment_height, :]
+        segment2 = img[segment_height:2 * segment_height, :]
+        segment3 = img[2 * segment_height:3 * segment_height, :]
+        segment4 = img[3 * segment_height:, :]
 
-        # Split the image into 4 equal parts
-        segment_height = height // 3
-        for i in range(3):
-            segment = img[i * segment_height: (i + 1) * segment_height, :]
-            # Do something with the segment, such as processing or displaying
-            gray = cv2.cvtColor(segment, cv2.COLOR_BGR2GRAY)
 
-            # Apply thresholding to make the line black and the background white
-            _, binary = cv2.threshold(gray, 60, 255, cv2.THRESH_BINARY_INV)
+        # Find the midpoint of the black line in each segment
+        def find_midpoint(segment):
+            nonzero_cols = np.nonzero(np.sum(segment, axis=0))[0]
+            x_coords = np.arange(segment.shape[1])[nonzero_cols]
+            weights = np.sum(segment[:, nonzero_cols], axis=0)
+            return int(np.average(x_coords, weights=weights))
 
-            # Find the edges of the line using the Canny edge detection algorithm
-            edges = cv2.Canny(binary, 50, 150)
-            #
-            # Detect lines using the Hough lines algorithm
-            lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 30, np.empty(1), minLineLength=30, maxLineGap=10)
 
-            if lines is not None:
-            #  Draw the lines on the image
-               for line in lines:
-                   x1, y1, x2, y2 = line[0]
-                   cv2.line(segment, (x1, y1), (x2, y2), (0, 0, 255), 2)
-            # Get the height and width of the image
-            cv2.imshow(f"Segment {i + 1}", segment)
+        midpoint1 = find_midpoint(segment1)
+        midpoint2 = find_midpoint(segment2)
+        midpoint3 = find_midpoint(segment3)
+        midpoint4 = find_midpoint(segment4)
+
+        cv2.circle(img, [midpoint1, midpoint2, midpoint3, midpoint4], 5, (255, 0, 0), -1)
+
 
 
         # Show the image
         # cv2.imshow("Line Detection", frame.array)
-        # cv2.imshow("og", img)
+        cv2.imshow("og", img)
         # cv2.imshow("Line Detection", edges)
 
         # Clear the stream in preparation for the next frame
