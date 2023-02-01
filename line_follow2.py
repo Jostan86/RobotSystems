@@ -296,7 +296,8 @@ if __name__=='__main__':
                 cv2.line(frame.array, (x1, y1), (x2, y2), (0, 0, 255), 2)
 
         # Show the image
-        cv2.imshow("Line Detection", frame.array)
+        # cv2.imshow("Line Detection", frame.array)
+        cv2.imshow("Line Detection", binary)
 
         # Clear the stream in preparation for the next frame
         rawCapture.truncate(0)
