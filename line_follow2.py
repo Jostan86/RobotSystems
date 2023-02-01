@@ -330,7 +330,7 @@ if __name__=='__main__':
                 return None
             x_coords = np.arange(segment.shape[1])[nonzero_cols]
             weights = np.sum(segment[:, nonzero_cols], axis=0)
-            return int(np.average(x_coords, weights=weights, axis=0))
+            return int(np.average(x_coords, weights=weights, axis=1))
 
 
         midpoint1 = find_midpoint(segment1)
