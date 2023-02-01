@@ -273,8 +273,8 @@ def find_2d_midpoint(segment):
 def is_line_present(segment, threshold):
     """Check if there is at least some minimum amount of line seen in the segment."""
     mask_sum = np.sum(segment)
-    print(mask_sum / (segment.shape[0] * segment.shape[1]))
-    if mask_sum / (segment.shape[0] * segment.shape[1]) < threshold:
+    print(mask_sum / (segment.shape[0] * segment.shape[1] * 255))
+    if mask_sum / (segment.shape[0] * segment.shape[1] * 255) < threshold:
         return False
     return True
 
