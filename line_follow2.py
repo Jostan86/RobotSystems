@@ -337,7 +337,7 @@ if __name__=='__main__':
         print(is_single_blob(binary, 100))
 
         detector = cv2.SimpleBlobDetector()
-        keypoints = detector.detect(binary)
+        keypoints = detector.detect(img)
         im_with_keypoints = cv2.drawKeypoints(img, keypoints, np.array([]), (0, 0, 255),
                                               cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
