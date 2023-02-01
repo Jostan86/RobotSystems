@@ -356,9 +356,12 @@ if __name__=='__main__':
         midpoint3 = find_2d_midpoint(segment3)
         midpoint4 = find_2d_midpoint(segment4)
         height = img.shape[0]
-        midpoint2[1] += int(0.25 * height)
-        midpoint3[1] += int(0.5 * height)
-        midpoint4[1] += int(0.75 * height)
+        if midpoint2 is not None:
+            midpoint2[1] += int(0.25 * height)
+        if midpoint3 is not None:
+            midpoint3[1] += int(0.5 * height)
+        if midpoint4 is not None:
+            midpoint4[1] += int(0.75 * height)
         cv2.circle(img, midpoint1, 5, (255, 0, 0), -1)
         cv2.circle(img, midpoint2, 5, (255, 0, 0), -1)
         cv2.circle(img, midpoint3, 5, (255, 0, 0), -1)
