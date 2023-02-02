@@ -17,64 +17,6 @@ import numpy as np
 import time
 import math
 
-class GS_Line_Follow_Interpereter:
-    def __init__(self, px, sensitivity=300, line_darker=True):
-        self.stop_threshold = 70
-        self.px = px
-        self.sensitivity = sensitivity
-        if line_darker:
-            self.polarity = 1
-        else:
-            self.polarity = -1
-    def stop_check (self, sensor_reading):
-        if abs(sensor_reading[0] - sensor_reading[1]) < self.stop_threshold and abs(sensor_reading[2] - sensor_reading[1]) < self.stop_threshold:
-
-            return True
-        else:
-            return False
-
-    def get_direction(self, sensor_readings):
-
-        range_max = max(sensor_readings)
-        range_min = range_max - self.sensitivity
-        if range_min < 0:
-            range_min = 0
-
-        for sensor_num, sensor_reading in enumerate(sensor_readings):
-            if sensor_reading > range_max:
-                sensor_readings[sensor_num] = range_max
-            if sensor_reading < range_min:
-                sensor_readings[sensor_num] = range_min
-
-        diff_left = self.polarity * ((sensor_readings[0] - sensor_readings[1])/self.sensitivity)
-        diff_right = self.polarity * (-(sensor_readings[2] - sensor_readings[1])/self.sensitivity)
-
-        steering_scale = diff_right + diff_left
-        return steering_scale
-
-
-
-class Line_Follow_Controller:
-    def __init__(self, px, interpreter):
-        self.px = px
-        self.interpreter = interpreter
-    def follow_line(self):
-        try:
-            while True:
-                sensor_readings = px.get_grayscale_data()
-                if self.interpreter.stop_check(sensor_readings):
-                    self.px.stop()
-                else:
-                    px.set_dir_servo_angle(25 * self.interpreter.get_direction(sensor_readings))
-                    px.forward(40)
-
-                sleep(.01)
-        finally:
-            px.stop()
-
-class CV_Line_Follow_Interpreter:
-    def __init__(self):
-        ...
 def find_2d_midpoint(segment):
 
     nonzero_rows, nonzero_cols = np.nonzero(segment)
@@ -138,7 +80,9 @@ def convert_to_relative_pos(point_pixel, image_height, image_width):
     x = sign * ((y + 11.6) * np.tan(np.radians(26.41 * (x_pos / (image_width/2)))))
     return (x, y)
 
-def check_for_2_consecutive_nones(list_of_nones):
+def check_for_2_consecutive_non_nones(list_of_nones):
+    """Checks to see if there are 2 consecutive non None values in a list, and only 2 values total, returns true if
+    these conditions are met. This function is actually being used at the moment."""
     non_none_count = 0
     last_non_none_index = None
     for i, val in enumerate(list_of_nones):
@@ -153,6 +97,7 @@ def check_for_2_consecutive_nones(list_of_nones):
         return non_none_count == 2
 
 def angles_between_points(points):
+    """Find the angles between a list of points"""
     angles = []
     for i in range(1, len(points)):
         x1, y1 = points[i-1]
@@ -162,29 +107,50 @@ def angles_between_points(points):
     return angles
 
 def get_car_directions(midpoints, height, width):
+    """Get the angle based on the midpoints found in the image"""
+
+    # If no points are found or only 1 or 2, consider robot lost
     if all(val is None for val in midpoints):
         print("no line found")
         return None
     elif sum(val is not None for val in midpoints) <= 2:
         print("Can't see enough line")
         return None
+
+    # If three or more are seen, convert the midpoints to geometry relative to the car, add a point at the base of the
+    # front steering, and then find the average of all the angles between the segments.
     else:
         midpoints_rel_to_car = []
         for midpoint in midpoints:
             if midpoint is not None:
                 midpoints_rel_to_car.append(convert_to_relative_pos(midpoint, height, width))
-
         midpoints_rel_to_car.reverse()
-
-        # midpoints_rel_to_car = [(0, -4)] + midpoints_rel_to_car[0:3]
-        midpoints_rel_to_car = midpoints_rel_to_car[0:3]
+        midpoints_rel_to_car = [(0, -6)] + midpoints_rel_to_car[0:3]
         angles = angles_between_points(midpoints_rel_to_car)
         return np.average(angles)
 
 if __name__=='__main__':
+    # Threshold for converting the gray scale image into binary when looking for the line
+    gray_scale_threshold = 60
+    # number of segments to segment image into when looking for line
+    num_segments = 6
+    # Threshold of the number of pixels (as a fraction of the total) in a segment that must belong to the line
+    # in order for the segment to be considered.
+    contains_line_threshold = 0.05
+    # Does not consider blobs smaller than this when determining if there are more than 1 blob in a segment
+    remove_blob_size = 200
+
+    # Time to delay steering by
+    delay_time = 0.3
+
+    move_speed = 40
+
+    # Angle camera faces downward, there are some hard coded aspects in converting a seen point to relative geometry
+    # that will break if this is changed
+    camera_angle = -25
+
     px = Picarx()
-    px.set_camera_servo2_angle(-25)
-    # controller = co
+    px.set_camera_servo2_angle(camera_angle)
     camera = PiCamera()
     camera.resolution = (640, 480)
     camera.framerate = 24
@@ -202,15 +168,7 @@ if __name__=='__main__':
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
         # Apply thresholding to make the line white and the background black
-        _, binary = cv2.threshold(gray, 60, 255, cv2.THRESH_BINARY_INV)
-
-        # Split the image into several segments and evalulate the location of the line for each
-        num_segments = 6
-        # Threshold of the number of pixels (as a fraction of the total) in a segment that must belong to the line
-        # in order for the segment to be considered.
-        contains_line_threshold = 0.05
-        # Does not consider blobs smaller than this when determining if there are more than 1 blob in a segment
-        remove_blob_size = 200
+        _, binary = cv2.threshold(gray, gray_scale_threshold, 255, cv2.THRESH_BINARY_INV)
 
         # Get the height and width of the image
         height, width = img.shape[:2]
@@ -221,7 +179,6 @@ if __name__=='__main__':
         # is one and only one large enough blob in the segment, then find the centroid of that blob.
         midpoints_rel_to_car = []
         midpoints = []
-
         for i in range(num_segments):
             # Make the segment
             segment = binary[i * segment_height: (i + 1) * segment_height, :]
@@ -230,42 +187,45 @@ if __name__=='__main__':
                 midpoint = None
                 midpoints.append(midpoint)
                 continue
+
             # Find the midpoint of the large blob (line) in the segment
             midpoint = find_2d_midpoint(segment)
-            # Add to the y value of the midpoint so that it can be compared relative to the whole image
 
+            # Add to the y value of the midpoint so that it can be compared relative to the whole image
             midpoint[1] += int(i * (1/num_segments) * height)
             midpoints.append(midpoint)
+
             # Add a dot where the midpoint was connected on the original image
             cv2.circle(img, midpoint, 5, (255, 0, 0), -1)
 
         steering_dir = get_car_directions(midpoints, height, width)
+
+        # Use the steering direction obtained from the image
         if steering_dir is not None:
-
-
+            # Convert to degrees
             steering_dir = -np.degrees(steering_dir)
             print("collected:" + str(steering_dir))
+
+            # Append it to the list of saved steering angles, along with the collection time
             now = time.time()
             steering_dir_save.append((steering_dir, now))
 
-            # remove all entries that are older than a second
-            steering_dir_save = [(v, t) for v, t in steering_dir_save if now - t < .3]
+            # remove all entries that are older than the set delay time
+            steering_dir_save = [(v, t) for v, t in steering_dir_save if now - t < delay_time]
 
-            # use the steering direction collected about a second ago
-            steering_dir = steering_dir_save[0][0] #if data and now - data[-1][1] >= 1 else None
+            # use the steering direction collected delay_time ago
+            steering_dir = steering_dir_save[0][0]
 
             print("using:" + str(steering_dir))
             print('\n')
+
             px.set_dir_servo_angle(steering_dir)
-            px.forward(40)
+            px.forward(move_speed)
+
         else:
             px.stop()
-        # print(get_car_directions(midpoints, height, width))
-
 
         cv2.imshow("OG", img)
-        # cv2.imshow("binary", binary)
-        # cv2.imshow("binary2", binary2)
 
         # Clear the stream in preparation for the next frame
         rawCapture.truncate(0)
@@ -279,14 +239,6 @@ if __name__=='__main__':
     px.stop()
     cv2.destroyAllWindows()
     camera.close()
-
-
-
-
-    # camera = CV_Line_Follow_Interpreter()
-    # interpreter = GS_Line_Follow_Interpereter(px)
-    # controller = Line_Follow_Controller(px, interpreter)
-    # controller.follow_line()
 
 
 
