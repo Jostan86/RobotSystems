@@ -176,7 +176,7 @@ def get_car_directions(midpoints, height, width):
 
         midpoints_rel_to_car.reverse()
 
-        midpoints_rel_to_car = [(0, -4)] + midpoints_rel_to_car
+        midpoints_rel_to_car = [(0, -4)] + midpoints_rel_to_car[0:3]
         angles = angles_between_points(midpoints_rel_to_car)
         return np.average(angles)
 
@@ -272,7 +272,9 @@ if __name__=='__main__':
 
         steering_dir = get_car_directions(midpoints, height, width)
         if steering_dir is not None:
+
             steering_dir = -np.degrees(steering_dir)
+            print(steering_dir)
             px.set_dir_servo_angle(steering_dir)
             px.forward(40)
         else:
