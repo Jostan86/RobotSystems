@@ -122,18 +122,18 @@ def convert_to_relative_pos(point_pixel, image_height, image_width):
     specific camera angle (-25), and that the camera is facing forwards. I doubt it would be very difficult to make it
     adaptable to different camera angles but that doesn't seem worth the effort at the moment."""
     # Horizontal and vertical FOV of the camera
-    vertical_fov = 49
+    vertical_fov = 49 * 0.75
     horizontal_fov = 62.2
 
     angle_base = 41
-    y_angle = angle_base + (point_pixel[1] / image_height) * vertical_fov
+    y_angle = angle_base + ((image_height-point_pixel[1]) / image_height) * vertical_fov
     y = 7.2 * np.tan(np.radians(y_angle))
     if point_pixel[0] > image_width/2:
         x_pos = point_pixel[0] - image_width/2
     else:
         x_pos = image_width/2 - point_pixel[0]
 
-    x = (y + 11.6) * np.tan(np.radians(26.41 * horizontal_fov * (x_pos / (image_width/2))))
+    x = (y + 11.6) * np.tan(np.radians(26.41 * (x_pos / (image_width/2))))
     return (x, y)
 
 if __name__=='__main__':
