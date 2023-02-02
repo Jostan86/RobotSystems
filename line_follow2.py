@@ -188,12 +188,13 @@ if __name__=='__main__':
                 midpoint[1] += int(i * (1/num_segments) * height)
 
             midpoints.append(midpoint)
+            print(midpoint)
+            print(convert_to_relative_pos(midpoint, height, width))
 
             # Add a dot where the midpoint was connected on the original image
             cv2.circle(img, midpoint, 5, (255, 0, 0), -1)
 
-        print(midpoints)
-        print(convert_to_relative_pos(midpoints, height, width))
+
 
 
 
