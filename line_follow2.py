@@ -260,7 +260,7 @@ if __name__=='__main__':
             # Add a dot where the midpoint was connected on the original image
             cv2.circle(img, midpoint, 5, (255, 0, 0), -1)
 
-        px.set_dir_servo_angle(np.degrees(get_car_directions(midpoints, height, width)[0]))
+        px.set_dir_servo_angle(-np.degrees(get_car_directions(midpoints, height, width)[0]))
         px.forward(40)
         # print(get_car_directions(midpoints, height, width))
 
@@ -278,6 +278,7 @@ if __name__=='__main__':
             break
 
     print('quit ...')
+    px.stop()
     cv2.destroyAllWindows()
     camera.close()
 
