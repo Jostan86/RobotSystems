@@ -273,8 +273,9 @@ if __name__=='__main__':
             # Add a dot where the midpoint was connected on the original image
             cv2.circle(img, midpoint, 5, (255, 0, 0), -1)
 
-        steering_dir = -np.degrees(get_car_directions(midpoints, height, width))
+        steering_dir = get_car_directions(midpoints, height, width)
         if steering_dir is not None:
+            steering_dir = -np.degrees(steering_dir)
             px.set_dir_servo_angle(steering_dir)
             px.forward(40)
         else:
