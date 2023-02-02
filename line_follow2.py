@@ -15,7 +15,7 @@ from picamera.array import PiRGBArray
 from picamera import PiCamera
 import numpy as np
 import time
-from sklearn.cluster import KMeans
+import math
 
 class GS_Line_Follow_Interpereter:
     def __init__(self, px, sensitivity=300, line_darker=True):
@@ -138,6 +138,69 @@ def convert_to_relative_pos(point_pixel, image_height, image_width):
     x = sign * ((y + 11.6) * np.tan(np.radians(26.41 * (x_pos / (image_width/2)))))
     return (x, y)
 
+def check_for_2_consecutive_nones(list_of_nones):
+    non_none_count = 0
+    last_non_none_index = None
+    for i, val in enumerate(list_of_nones):
+        if val is not None:
+            non_none_count += 1
+            if non_none_count > 2:
+                return False
+            if last_non_none_index is not None and i - last_non_none_index != 1:
+                return False
+            last_non_none_index = i
+    else:
+        return non_none_count == 2
+
+def angles_between_points(points):
+    angles = []
+    for i in range(1, len(points)):
+        x1, y1 = points[i-1]
+        x2, y2 = points[i]
+        angle = math.atan2(y2 - y1, x2 - x1)
+        angles.append(angle)
+    return angles
+
+def get_car_directions(midpoints, height, width):
+    midpoints_rel_to_car = []
+    for midpoint in midpoints:
+        midpoints_rel_to_car.append(convert_to_relative_pos(midpoint, height, width))
+
+    midpoints_rel_to_car.reverse()
+    midpoints.reverse()
+
+    if all(val is None for val in midpoints):
+        print("no line found")
+        return [None, None]
+    elif sum(val is not None for val in midpoints) == 1:
+        print("line appears to be horizontal")
+        return [np.pi/2, None]
+    elif check_for_2_consecutive_nones(midpoints):
+        print("2 points found")
+        return [angles_between_points(midpoints_rel_to_car), None]
+    elif sum(val is not None for val in midpoints) == 2:
+        print("2 non-consecutive points found")
+        return [np.pi / 2, None]
+    else:
+        angles = angles_between_points(midpoints_rel_to_car)
+        for i in range(len(angles) - 1):
+
+            angle_change = angles[i + 1] - angles[i]
+            if abs(angle_change) > np.pi / 6:
+                midpoints_rel_to_car = midpoints_rel_to_car[:i + 2]
+                break
+
+        if len(midpoints_rel_to_car) == 2:
+            return [angles_between_points(midpoints_rel_to_car), None]
+        elif len(midpoints_rel_to_car) <= 4:
+            return [np.average(angles_between_points(midpoints_rel_to_car)), None]
+        elif len(midpoints_rel_to_car) > 4:
+            midpoint = (len(midpoints_rel_to_car) + 1) // 2
+            points_close = midpoints_rel_to_car[:midpoint]
+            points_far = midpoints_rel_to_car[midpoint:]
+            return [np.average(angles_between_points(points_close)), np.average(angles_between_points(points_far))]
+
+
 if __name__=='__main__':
     px = Picarx()
     px.set_camera_servo2_angle(-25)
@@ -174,6 +237,7 @@ if __name__=='__main__':
 
         # Loop through each segment and determine the centroid of the line in that segment, or in reality, see if there
         # is one and only one large enough blob in the segment, then find the centroid of that blob.
+        midpoints_rel_to_car = []
         midpoints = []
 
         for i in range(num_segments):
@@ -182,31 +246,21 @@ if __name__=='__main__':
             # Check if there is one largish blob in the segment
             if not is_line_present(segment, contains_line_threshold) or not is_single_blob(segment, threshold=remove_blob_size):
                 midpoint = None
+                midpoints.append(midpoint)
                 continue
             # Find the midpoint of the large blob (line) in the segment
             midpoint = find_2d_midpoint(segment)
             # Add to the y value of the midpoint so that it can be compared relative to the whole image
-            if midpoint is not None:
-                midpoint[1] += int(i * (1/num_segments) * height)
-                print(midpoint)
-                print(convert_to_relative_pos(midpoint, height, width))
 
+            midpoint[1] += int(i * (1/num_segments) * height)
             midpoints.append(midpoint)
-
-
             # Add a dot where the midpoint was connected on the original image
             cv2.circle(img, midpoint, 5, (255, 0, 0), -1)
 
 
+        print(get_car_directions(midpoints, height, width))
 
 
-
-        # kernel_open = np.ones((3, 3), np.uint8)
-        # kernel_close = np.ones((10, 10), np.uint8)
-        # binary2 = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel_open)
-        # binary2 = cv2.morphologyEx(binary2, cv2.MORPH_CLOSE, kernel_close)
-
-        # cv2.imshow("og", img)
         cv2.imshow("OG", img)
         # cv2.imshow("binary", binary)
         # cv2.imshow("binary2", binary2)
