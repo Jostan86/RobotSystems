@@ -206,7 +206,7 @@ def get_car_directions(midpoints, height, width):
 if __name__=='__main__':
     px = Picarx()
     px.set_camera_servo2_angle(-25)
-    controller = co
+    # controller = co
     camera = PiCamera()
     camera.resolution = (640, 480)
     camera.framerate = 24
