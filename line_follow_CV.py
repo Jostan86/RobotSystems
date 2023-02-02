@@ -276,7 +276,7 @@ if __name__=='__main__':
         if steering_dir is not None:
 
 
-            steering_dir = -np.degrees(steering_dir)
+            steering_dir = -np.degrees(steering_dir)/2
             print("collected:" + str(steering_dir))
             now = time.time()
             steering_dir_save.append((steering_dir, now))
