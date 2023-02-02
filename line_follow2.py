@@ -178,7 +178,8 @@ def get_car_directions(midpoints, height, width):
         return [np.pi/2, None]
     elif check_for_2_consecutive_nones(midpoints):
         print("2 points found")
-        return [angles_between_points(midpoints_rel_to_car), None]
+        midpoints_rel_to_car = [(0, 0)] + midpoints_rel_to_car
+        return [np.average(angles_between_points(midpoints_rel_to_car)), None]
     elif sum(val is not None for val in midpoints) == 2:
         print("2 non-consecutive points found")
         return [np.pi / 2, None]
