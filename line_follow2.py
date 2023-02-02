@@ -52,9 +52,7 @@ class GS_Line_Follow_Interpereter:
         steering_scale = diff_right + diff_left
         return steering_scale
 
-class CV_Line_Follow_Interpreter:
-    def __init__(self):
-        ...
+
 
 class Line_Follow_Controller:
     def __init__(self, px, interpreter):
@@ -74,7 +72,9 @@ class Line_Follow_Controller:
         finally:
             px.stop()
 
-
+class CV_Line_Follow_Interpreter:
+    def __init__(self):
+        ...
 def find_2d_midpoint(segment):
 
     nonzero_rows, nonzero_cols = np.nonzero(segment)
@@ -206,6 +206,7 @@ def get_car_directions(midpoints, height, width):
 if __name__=='__main__':
     px = Picarx()
     px.set_camera_servo2_angle(-25)
+    controller = co
     camera = PiCamera()
     camera.resolution = (640, 480)
     camera.framerate = 24
@@ -259,8 +260,9 @@ if __name__=='__main__':
             # Add a dot where the midpoint was connected on the original image
             cv2.circle(img, midpoint, 5, (255, 0, 0), -1)
 
-
-        print(get_car_directions(midpoints, height, width))
+        px.set_dir_servo_angle(np.degrees(get_car_directions(midpoints, height, width)[0]))
+        px.forward(40)
+        # print(get_car_directions(midpoints, height, width))
 
 
         cv2.imshow("OG", img)
