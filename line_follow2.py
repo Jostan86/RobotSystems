@@ -164,7 +164,8 @@ def angles_between_points(points):
 def get_car_directions(midpoints, height, width):
     midpoints_rel_to_car = []
     for midpoint in midpoints:
-        midpoints_rel_to_car.append(convert_to_relative_pos(midpoint, height, width))
+        if midpoint is not None:
+            midpoints_rel_to_car.append(convert_to_relative_pos(midpoint, height, width))
 
     midpoints_rel_to_car.reverse()
     midpoints.reverse()
