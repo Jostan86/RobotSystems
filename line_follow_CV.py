@@ -213,6 +213,7 @@ def get_car_directions(midpoints, height, width):
     #         return [np.average(angles_between_points(points_close)), np.average(angles_between_points(points_far))]
 
 
+
 if __name__=='__main__':
     px = Picarx()
     px.set_camera_servo2_angle(-25)
@@ -222,6 +223,7 @@ if __name__=='__main__':
     camera.framerate = 24
     rawCapture = PiRGBArray(camera, size=camera.resolution)
     time.sleep(2)
+    steering_dir_save = []
     # Capture frames from the camera
     for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
         # cut off top quarter of image (to avoid seeing too much background)
@@ -273,8 +275,20 @@ if __name__=='__main__':
         steering_dir = get_car_directions(midpoints, height, width)
         if steering_dir is not None:
 
+
             steering_dir = -np.degrees(steering_dir)
-            print(steering_dir)
+            print("collected:" + str(steering_dir))
+            now = time.time()
+            steering_dir_save.append((steering_dir, now))
+
+            # remove all entries that are older than a second
+            data = [(v, t) for v, t in steering_dir_save if now - t < 1]
+
+            # use the steering direction collected about a second ago
+            steering_dir = data[-1][0] #if data and now - data[-1][1] >= 1 else None
+
+            print("using:" + str(steering_dir))
+            print('\n')
             px.set_dir_servo_angle(steering_dir)
             px.forward(40)
         else:
