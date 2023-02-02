@@ -10,15 +10,9 @@
 '''
 from picarx_improved import Picarx
 from time import sleep
-import cv2
-from picamera.array import PiRGBArray
-from picamera import PiCamera
-import numpy as np
-import time
 
 class GS_Line_Follow_Interpereter:
-    def __init__(self, px, sensor_reading_bus, sensitivity=300, line_darker=True):
-        self.sensor_readings_bus = sensor_reading_bus
+    def __init__(self, px, sensitivity=300, line_darker=True):
         self.stop_threshold = 70
         self.px = px
         self.sensitivity = sensitivity
@@ -52,10 +46,6 @@ class GS_Line_Follow_Interpereter:
         steering_scale = diff_right + diff_left
         return steering_scale
 
-class CV_Line_Follow_Interpreter:
-    def __init__(self):
-        ...
-
 class Line_Follow_Controller:
     def __init__(self, px, interpreter):
         self.px = px
@@ -74,25 +64,12 @@ class Line_Follow_Controller:
         finally:
             px.stop()
 
-class Bus_Structure:
-    def __init__(self):
-        self.message = None
-
-    def write(self, message):
-        self.message = message
-
-    def read(self):
-        return self.message
-
 
 if __name__=='__main__':
     px = Picarx()
-    GS_sensor_bus = Bus_Structure()
-    # px.set_camera_servo2_angle(-35)
-    # camera = CV_Line_Follow_Interpreter()
-    # interpreter = GS_Line_Follow_Interpereter(px, GS_sensor_bus)
-    # controller = Line_Follow_Controller(px, interpreter)
-    # controller.follow_line()
+    interpreter = GS_Line_Follow_Interpereter(px)
+    controller = Line_Follow_Controller(px, interpreter)
+    controller.follow_line()
 
 
 
