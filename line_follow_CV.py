@@ -177,7 +177,7 @@ def get_car_directions(midpoints, height, width):
         return None
 
     else:
-        midpoints_rel_to_car = [(0, 0)] + midpoints_rel_to_car
+        midpoints_rel_to_car = [(0, -3)] + midpoints_rel_to_car
         angles = angles_between_points(midpoints_rel_to_car)
         return np.average(angles)
 
