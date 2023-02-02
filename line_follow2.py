@@ -158,7 +158,7 @@ def angles_between_points(points):
         x1, y1 = points[i-1]
         x2, y2 = points[i]
         angle = math.atan2(y2 - y1, x2 - x1)
-        angles.append(angle)
+        angles.append(angle - np.pi / 2 )
     return angles
 
 def get_car_directions(midpoints, height, width):
