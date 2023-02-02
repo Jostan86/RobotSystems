@@ -186,10 +186,11 @@ if __name__=='__main__':
             # Add to the y value of the midpoint so that it can be compared relative to the whole image
             if midpoint is not None:
                 midpoint[1] += int(i * (1/num_segments) * height)
+                print(midpoint)
+                print(convert_to_relative_pos(midpoint, height, width))
 
             midpoints.append(midpoint)
-            print(midpoint)
-            print(convert_to_relative_pos(midpoint, height, width))
+
 
             # Add a dot where the midpoint was connected on the original image
             cv2.circle(img, midpoint, 5, (255, 0, 0), -1)
