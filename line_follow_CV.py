@@ -162,21 +162,23 @@ def angles_between_points(points):
     return angles
 
 def get_car_directions(midpoints, height, width):
-    midpoints_rel_to_car = []
-    for midpoint in midpoints:
-        if midpoint is not None:
-            midpoints_rel_to_car.append(convert_to_relative_pos(midpoint, height, width))
-
-    midpoints_rel_to_car.reverse()
-    midpoints.reverse()
     if all(val is None for val in midpoints):
         print("no line found")
         return None
     elif sum(val is not None for val in midpoints) <= 2:
         print("Can't see enough line")
         return None
-
     else:
+        midpoints_rel_to_car = []
+        for midpoint in midpoints:
+            if midpoint is not None:
+                midpoints_rel_to_car.append(convert_to_relative_pos(midpoint, height, width))
+
+        midpoints_rel_to_car.reverse()
+        midpoints.reverse()
+
+
+
         midpoints_rel_to_car = [(0, 0)] + midpoints_rel_to_car
         angles = angles_between_points(midpoints_rel_to_car)
         return np.average(angles)
