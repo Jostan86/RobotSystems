@@ -282,10 +282,10 @@ if __name__=='__main__':
             steering_dir_save.append((steering_dir, now))
 
             # remove all entries that are older than a second
-            data = [(v, t) for v, t in steering_dir_save if now - t < 2]
+            steering_dir_save = [(v, t) for v, t in steering_dir_save if now - t < 1]
 
             # use the steering direction collected about a second ago
-            steering_dir = data[-1][0] #if data and now - data[-1][1] >= 1 else None
+            steering_dir = steering_dir_save[0][0] #if data and now - data[-1][1] >= 1 else None
 
             print("using:" + str(steering_dir))
             print('\n')
