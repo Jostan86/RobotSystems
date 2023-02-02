@@ -54,192 +54,7 @@ class GS_Line_Follow_Interpereter:
 
 class CV_Line_Follow_Interpreter:
     def __init__(self):
-        with PiCamera() as camera:
-            print("start color detect")
-            camera.resolution = (640, 480)
-            camera.framerate = 24
-            rawCapture = PiRGBArray(camera, size=camera.resolution)
-            time.sleep(2)
-
-            for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
-                img = frame.array
-                height = img.shape[0]
-                img = img[int(height/4):,:]
-                # img, img_2, img_3 = self.color_detect(img, 'red')  # Color detection function
-                # cv2.imshow("video", img)  # OpenCV image show
-                # cv2.imshow("mask", img_2)  # OpenCV image show
-                # cv2.imshow("morphologyEx_img", img_3)  # OpenCV image show
-                # rawCapture.truncate(0)  # Release cache
-                #
-                # k = cv2.waitKey(1) & 0xFF
-                # # 27 is the ESC key, which means that if you press the ESC key to exit
-                # if k == 27:
-                #     break
-
-
-                # # Convert the image to grayscale
-                # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-                #
-                # # Threshold the grayscale image to get only black pixels
-                # _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-                #
-                # # Find edges using Canny
-                # edges = cv2.Canny(thresh, 100, 200)
-                #
-                # # Perform Hough Transform on the edges
-                # lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 50, maxLineGap=50)
-                #
-                # # Draw lines on the image
-                # for line in lines:
-                #     x1, y1, x2, y2 = line[0]
-                #     cv2.line(img, (x1, y1), (x2, y2), (0, 0, 255), 2)
-                # Convert the image to HSV color space
-                # hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-                #
-                # # Define a range of black color in HSV
-                # lower_black = np.array([0, 0, 0])
-                # upper_black = np.array([180, 255, 40])
-                #
-                # # Threshold the HSV image to get only black pixels
-                # mask = cv2.inRange(hsv, lower_black, upper_black)
-                #
-                # # Find edges using Canny
-                # edges = cv2.Canny(mask, 200, 400)
-                #
-                # # Perform Hough Transform on the edges
-                # lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 25, maxLineGap=10, minLineLength=50)
-                # #lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 50, maxLineGap=20, minLineLength=200)
-                #
-                #
-                # save_fit = []
-                # # Draw lines on the image
-                # if lines is not None:
-                #     for line in lines:
-                #         x1, y1, x2, y2 = line[0]
-                #         if x1 == x2:
-                #             pass
-                #         fit = np.polyfit((x1, x2), (y1, y2), 1)
-                #         slope = fit[0]
-                #         intercept = fit[1]
-                #         save_fit.append((slope, intercept))
-                #         cv2.line(img, (x1, y1), (x2, y2), (0, 0, 255), 2)
-                #
-                #     fit_average = np.average(save_fit, axis=0)
-                #     if len(save_fit) > 0:
-                #         #lane_lines.append(make_points(img, fit_average)
-                #
-                #         height, width, _ = img.shape
-                #         slope, intercept = fit_average
-                #         y1 = height
-                #         y2 = 0
-                #         x1 = max(-width, min(2 * width, int((y1-intercept)/slope)))
-                #         x2 = max(-width, min(2 * width, int((y2-intercept)/slope)))
-                #
-                #         cv2.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                #
-                #
-                #
-
-                gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-                blur = cv2.GaussianBlur(gray, (5, 5), 0)
-                ret, thresh = cv2.threshold(blur, 60, 255, cv2.THRESH_BINARY_INV)
-                contours, hierarchy = cv2.findContours(thresh.copy(), 1, cv2.CHAIN_APPROX_NONE)
-                if len(contours) > 0:
-
-                    c = max(contours, key=cv2.contourArea)
-
-                    M = cv2.moments(c)
-
-                    cx = int(M['m10'] / M['m00'])
-
-                    cy = int(M['m01'] / M['m00'])
-
-                    cv2.line(img, (cx, 0), (cx, 720), (255, 0, 0), 1)
-
-                    cv2.line(img, (0, cy), (1280, cy), (255, 0, 0), 1)
-
-                    cv2.drawContours(img, contours, -1, (0, 255, 0), 1)
-
-                    if cx >= 120:
-                        print("Turn Left!")
-
-                    if cx < 120 and cx > 50:
-                        print("On Track!")
-
-                    if cx <= 50:
-                        print("Turn Right")
-
-
-
-                else:
-
-                    print("I don't see the line")
-
-
-                # Show the result
-                cv2.imshow('lines', img)
-                # cv2.imshow('mask', mask)
-                rawCapture.truncate(0)  # Release cache
-
-                k = cv2.waitKey(1) & 0xFF
-                # 27 is the ESC key, which means that if you press the ESC key to exit
-                if k == 27:
-                    break
-
-            print('quit ...')
-            cv2.destroyAllWindows()
-            camera.close()
-
-        self.color_dict = {'red': [0, 4], 'orange': [5, 18], 'yellow': [22, 37], 'green': [42, 85], 'blue': [92, 110],
-                      'purple': [115, 165],
-                      'red_2': [165, 180]}  # Here is the range of H in the HSV color space represented by the color
-
-        self.kernel_5 = np.ones((5, 5), np.uint8)  # Define a 5×5 convolution kernel with element values of all 1.
-
-    def color_detect(self,img, color_name):
-
-        # The blue range will be different under different lighting conditions and can be adjusted flexibly.  H: chroma, S: saturation v: lightness
-        resize_img = cv2.resize(img, (160, 120),
-                                interpolation=cv2.INTER_LINEAR)  # In order to reduce the amount of calculation, the size of the picture is reduced to (160,120)
-        hsv = cv2.cvtColor(resize_img, cv2.COLOR_BGR2HSV)  # Convert from BGR to HSV
-        color_type = color_name
-
-        mask = cv2.inRange(hsv, np.array([min( self.color_dict[color_type]), 60, 60]), np.array(
-            [max( self.color_dict[color_type]), 255,
-             255]))  # inRange()：Make the ones between lower/upper white, and the rest black
-        if color_type == 'red':
-            mask_2 = cv2.inRange(hsv, ( self.color_dict['red_2'][0], 0, 0), ( self.color_dict['red_2'][1], 255, 255))
-            mask = cv2.bitwise_or(mask, mask_2)
-
-        morphologyEx_img = cv2.morphologyEx(mask, cv2.MORPH_OPEN, self.kernel_5,
-                                            iterations=1)  # Perform an open operation on the image
-
-        # Find the contour in morphologyEx_img, and the contours are arranged according to the area from small to large.
-        _tuple = cv2.findContours(morphologyEx_img, cv2.REdeTR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        # compatible with opencv3.x and openc4.x
-        if len(_tuple) == 3:
-            _, contours, hierarchy = _tuple
-        else:
-            contours, hierarchy = _tuple
-
-        color_area_num = len(contours)  # Count the number of contours
-
-        if color_area_num > 0:
-            for i in contours:  # Traverse all contours
-                x, y, w, h = cv2.boundingRect(
-                    i)  # Decompose the contour into the coordinates of the upper left corner and the width and height of the recognition object
-
-                # Draw a rectangle on the image (picture, upper left corner coordinate, lower right corner coordinate, color, line width)
-                if w >= 8 and h >= 8:  # Because the picture is reduced to a quarter of the original size, if you want to draw a rectangle on the original picture to circle the target, you have to multiply x, y, w, h by 4.
-                    x = x * 4
-                    y = y * 4
-                    w = w * 4
-                    h = h * 4
-                    cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)  # Draw a rectangular frame
-                    cv2.putText(img, color_type, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255),
-                                2)  # Add character description
-
-        return img, mask, morphologyEx_img
+        ...
 
 class Line_Follow_Controller:
     def __init__(self, px, interpreter):
@@ -277,24 +92,49 @@ def is_line_present(segment, threshold):
         return False
     return True
 def is_single_blob(segment, threshold=200):
+    """Determine if there are multiple blobs in the segment"""
+    # Morphology to get rid of small dots in image
     kernel_open = np.ones((3, 3), np.uint8)
     kernel_close = np.ones((10, 10), np.uint8)
     segment = cv2.morphologyEx(segment, cv2.MORPH_OPEN, kernel_open)
     segment = cv2.morphologyEx(segment, cv2.MORPH_CLOSE, kernel_close)
+
+    # Find blobs
     num_components, labels, stats, centroids = cv2.connectedComponentsWithStats(segment, 8, cv2.CV_32S)
 
+    # Determine how many large blobs there are
     num_components_using = 0
+    # Range starts at 1 because first component is the background
     for i in range(1, num_components):
         x, y, w, h, size = stats[i]
-
         if size > threshold:
             num_components_using += 1
-
         # cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
         # cv2.circle(img, (int(centroids[i][0]), int(centroids[i][1])), 4, (0, 0, 255), -1)
+
+    # If there are more than 1 large blob, return false, otherwise return true
     if num_components_using > 1:
         return False
     return True
+
+def convert_to_relative_pos(point_pixel, image_height, image_width):
+    """This function finds the position of a point in the image relative to the robot in the real world. It assumes a
+    specific camera angle (-25), and that the camera is facing forwards. I doubt it would be very difficult to make it
+    adaptable to different camera angles but that doesn't seem worth the effort at the moment."""
+    # Horizontal and vertical FOV of the camera
+    vertical_fov = 49
+    horizontal_fov = 62.2
+
+    angle_base = 41
+    y_angle = angle_base + (point_pixel[1] / image_height) * vertical_fov
+    y = 7.2 * np.tan(np.radians(y_angle))
+    if point_pixel[0] > image_width/2:
+        x_pos = point_pixel[0] - image_width/2
+    else:
+        x_pos = image_width/2 - point_pixel[0]
+
+    x = (y + 11.6) * np.tan(np.radians(26.41 * horizontal_fov * (x_pos / (image_width/2))))
+    return (x, y)
 
 if __name__=='__main__':
     px = Picarx()
@@ -306,47 +146,66 @@ if __name__=='__main__':
     time.sleep(2)
     # Capture frames from the camera
     for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
-        # Convert the frame to grayscale
+        # cut off top quarter of image (to avoid seeing too much background)
         img = frame.array
         height = img.shape[0]
         img = img[int(height/4):,:]
+
+        # Convert the frame to grayscale, using black tape so this works, otherwise it would have to be different
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        #
-        # # Apply thresholding to make the line black and the background white
+
+        # Apply thresholding to make the line white and the background black
         _, binary = cv2.threshold(gray, 60, 255, cv2.THRESH_BINARY_INV)
 
-
+        # Split the image into several segments and evalulate the location of the line for each
         num_segments = 6
+        # Threshold of the number of pixels (as a fraction of the total) in a segment that must belong to the line
+        # in order for the segment to be considered.
         contains_line_threshold = 0.05
+        # Does not consider blobs smaller than this when determining if there are more than 1 blob in a segment
         remove_blob_size = 200
 
         # Get the height and width of the image
         height, width = img.shape[:2]
-
+        # Calculate the height of each segment
         segment_height = height // num_segments
 
+        # Loop through each segment and determine the centroid of the line in that segment, or in reality, see if there
+        # is one and only one large enough blob in the segment, then find the centroid of that blob.
+        midpoints = []
+
         for i in range(num_segments):
+            # Make the segment
             segment = binary[i * segment_height: (i + 1) * segment_height, :]
+            # Check if there is one largish blob in the segment
             if not is_line_present(segment, contains_line_threshold) or not is_single_blob(segment, threshold=remove_blob_size):
                 midpoint = None
                 continue
+            # Find the midpoint of the large blob (line) in the segment
             midpoint = find_2d_midpoint(segment)
+            # Add to the y value of the midpoint so that it can be compared relative to the whole image
             if midpoint is not None:
                 midpoint[1] += int(i * (1/num_segments) * height)
 
+            midpoints.append(midpoint)
+
+            # Add a dot where the midpoint was connected on the original image
             cv2.circle(img, midpoint, 5, (255, 0, 0), -1)
 
+        print(midpoints)
+        print(convert_to_relative_pos(midpoints, height, width))
 
 
-        kernel_open = np.ones((3, 3), np.uint8)
-        kernel_close = np.ones((10, 10), np.uint8)
-        binary2 = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel_open)
-        binary2 = cv2.morphologyEx(binary2, cv2.MORPH_CLOSE, kernel_close)
+
+        # kernel_open = np.ones((3, 3), np.uint8)
+        # kernel_close = np.ones((10, 10), np.uint8)
+        # binary2 = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel_open)
+        # binary2 = cv2.morphologyEx(binary2, cv2.MORPH_CLOSE, kernel_close)
 
         # cv2.imshow("og", img)
         cv2.imshow("OG", img)
-        cv2.imshow("binary", binary)
-        cv2.imshow("binary2", binary2)
+        # cv2.imshow("binary", binary)
+        # cv2.imshow("binary2", binary2)
 
         # Clear the stream in preparation for the next frame
         rawCapture.truncate(0)
