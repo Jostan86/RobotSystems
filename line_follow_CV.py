@@ -176,43 +176,10 @@ def get_car_directions(midpoints, height, width):
 
         midpoints_rel_to_car.reverse()
 
-        midpoints_rel_to_car = [(0, -4)] + midpoints_rel_to_car[0:3]
+        # midpoints_rel_to_car = [(0, -4)] + midpoints_rel_to_car[0:3]
+        midpoints_rel_to_car = midpoints_rel_to_car[0:3]
         angles = angles_between_points(midpoints_rel_to_car)
         return np.average(angles)
-
-    # if all(val is None for val in midpoints):
-    #     print("no line found")
-    #     return [None, None]
-    # elif sum(val is not None for val in midpoints) == 1:
-    #     print("line appears to be horizontal")
-    #     return [np.pi/2, None]
-    # elif check_for_2_consecutive_nones(midpoints):
-    #     print("2 points found")
-    #     midpoints_rel_to_car = [(0, 0)] + midpoints_rel_to_car
-    #     return [np.average(angles_between_points(midpoints_rel_to_car)), None]
-    # elif sum(val is not None for val in midpoints) == 2:
-    #     print("2 non-consecutive points found")
-    #     return [np.pi / 2, None]
-    # else:
-    #     angles = angles_between_points(midpoints_rel_to_car)
-    #     for i in range(len(angles) - 1):
-    #
-    #         angle_change = angles[i + 1] - angles[i]
-    #         if abs(angle_change) > np.pi / 6:
-    #             midpoints_rel_to_car = midpoints_rel_to_car[:i + 2]
-    #             break
-    #
-    #     if len(midpoints_rel_to_car) == 2:
-    #         return [angles_between_points(midpoints_rel_to_car), None]
-    #     elif len(midpoints_rel_to_car) <= 4:
-    #         return [np.average(angles_between_points(midpoints_rel_to_car)), None]
-    #     elif len(midpoints_rel_to_car) > 4:
-    #         midpoint = (len(midpoints_rel_to_car) + 1) // 2
-    #         points_close = midpoints_rel_to_car[:midpoint]
-    #         points_far = midpoints_rel_to_car[midpoint:]
-    #         return [np.average(angles_between_points(points_close)), np.average(angles_between_points(points_far))]
-
-
 
 if __name__=='__main__':
     px = Picarx()
