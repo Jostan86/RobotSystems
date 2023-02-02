@@ -130,10 +130,12 @@ def convert_to_relative_pos(point_pixel, image_height, image_width):
     y = 7.2 * np.tan(np.radians(y_angle))
     if point_pixel[0] > image_width/2:
         x_pos = point_pixel[0] - image_width/2
+        sign = 1
     else:
+        sign = -1
         x_pos = image_width/2 - point_pixel[0]
 
-    x = (y + 11.6) * np.tan(np.radians(26.41 * (x_pos / (image_width/2))))
+    x = sign * ((y + 11.6) * np.tan(np.radians(26.41 * (x_pos / (image_width/2)))))
     return (x, y)
 
 if __name__=='__main__':
