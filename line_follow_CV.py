@@ -209,7 +209,7 @@ class CV_controller:
         for frame in self.camera.capture_continuous(self.rawCapture, format="bgr", use_video_port=True):
 
             img = frame.array
-            steering_dir, img = interpreter.get_angle_from_frame(self, img)
+            steering_dir, img = interpreter.get_angle_from_frame(img)
 
             # Use the steering direction obtained from the image
             if steering_dir is not None:
