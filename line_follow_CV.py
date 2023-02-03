@@ -141,8 +141,9 @@ class CV_Interpreter:
             angles = self.angles_between_points(midpoints_rel_to_car)
             return np.average(angles)
 
-    def get_angle_from_frame(self, frame):
-        img = frame
+    def get_angle_from_frame(self, camera_frame):
+        # cut off top quarter of image (to avoid seeing too much background)
+        img = camera_frame
         height = img.shape[0]
         img = img[int(height / 4):, :]
 
@@ -205,11 +206,10 @@ class CV_controller:
         time.sleep(2)
         self.steering_dir_save = []
 
-    def start_line_following(self):
         for frame in self.camera.capture_continuous(self.rawCapture, format="bgr", use_video_port=True):
-            # cut off top quarter of image (to avoid seeing too much background)
 
-            steering_dir, img = interpreter.get_angle_from_frame(self, frame.array)
+            img = frame.array
+            steering_dir, img = interpreter.get_angle_from_frame(self, img)
 
             # Use the steering direction obtained from the image
             if steering_dir is not None:
@@ -219,24 +219,24 @@ class CV_controller:
 
                 # Append it to the list of saved steering angles, along with the collection time
                 now = time.time()
-                steering_dir_save.append((steering_dir, now))
+                self.steering_dir_save.append((steering_dir, now))
 
                 # remove all entries that are older than the set delay time
-                steering_dir_save = [(v, t) for v, t in steering_dir_save if now - t < self.delay_time]
+                self.steering_dir_save = [(v, t) for v, t in self.steering_dir_save if now - t < self.delay_time]
 
                 # use the steering direction collected delay_time ago
-                steering_dir = steering_dir_save[0][0]
+                steering_dir = self.steering_dir_save[0][0]
 
                 print("using:" + str(steering_dir))
                 print('\n')
 
-                px.set_dir_servo_angle(steering_dir)
-                px.forward(self.move_speed)
+                self.px.set_dir_servo_angle(steering_dir)
+                self.px.forward(self.move_speed)
 
             else:
-                px.stop()
+                self.px.stop()
 
-            cv2.imshow("OG", img)
+            # cv2.imshow("OG", img)
 
             # Clear the stream in preparation for the next frame
             self.rawCapture.truncate(0)
@@ -247,7 +247,7 @@ class CV_controller:
                 break
 
         print('quit ...')
-        px.stop()
+        self.px.stop()
         cv2.destroyAllWindows()
         self.camera.close()
 
@@ -258,7 +258,6 @@ if __name__=='__main__':
     px = Picarx()
     interpreter = CV_Interpreter()
     controller = CV_controller(px, interpreter)
-    controller.start_line_following()
 
 
 
