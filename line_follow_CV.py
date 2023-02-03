@@ -209,7 +209,7 @@ class CV_controller:
         for frame in self.camera.capture_continuous(self.rawCapture, format="bgr", use_video_port=True):
 
             img = frame.array
-            steering_dir, img = interpreter.get_angle_from_frame(img)
+            steering_dir, img_return = interpreter.get_angle_from_frame(img)
 
             # Use the steering direction obtained from the image
             if steering_dir is not None:
@@ -236,7 +236,7 @@ class CV_controller:
             else:
                 self.px.stop()
 
-            # cv2.imshow("OG", img)
+            cv2.imshow("OG", img_return)
 
             # Clear the stream in preparation for the next frame
             self.rawCapture.truncate(0)
