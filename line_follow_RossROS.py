@@ -48,12 +48,11 @@ class GS_Line_Follow_Interpereter:
         steering_scale = diff_right + diff_left
         return steering_scale
 
-    def producer_consumer(self, sensor_bus, interpreter_bus, delay_time):
-        while True:
-            sensor_msg = sensor_bus.read()
-            interpreter_msg = self.get_direction(sensor_msg)
-            interpreter_bus.write(interpreter_msg)
-            sleep(delay_time)
+    def producer_consumer(self, sensor_bus):
+
+        sensor_msg = sensor_bus[0]
+        interpreter_msg = self.get_direction(sensor_msg)
+        return interpreter_msg
 
 class Line_Follow_Controller:
     def __init__(self, px, interpreter, sensor):
@@ -75,17 +74,14 @@ class Line_Follow_Controller:
         finally:
             px.stop()
 
-    def consumer(self, interpreter_bus, delay_time):
+    def consumer(self, interpreter_bus):
 
-        while True:
-            interpreter_msg = interpreter_bus.read()
-            if interpreter_msg is None:
-                self.px.stop()
-            else:
-                px.set_dir_servo_angle(25 * interpreter_msg)
-                px.forward(40)
-
-            sleep(delay_time)
+        interpreter_msg = interpreter_bus[0]
+        if interpreter_msg is None:
+            self.px.stop()
+        else:
+            px.set_dir_servo_angle(25 * interpreter_msg)
+            px.forward(40)
 
 
 class GS_sensor:
@@ -95,10 +91,10 @@ class GS_sensor:
     def read_sensor(self):
         return px.get_grayscale_data()
 
-    def producer_sensor(self, sensor_bus, delay_time):
-        while True:
-            sensor_bus.write(self.read_sensor())
-            sleep(delay_time)
+    # def producer_sensor(self, sensor_bus, delay_time):
+    #
+    #         sensor_bus.write(self.read_sensor())
+    #         sleep(delay_time)
 
 
 class bus_struct:
@@ -127,8 +123,8 @@ if __name__=='__main__':
     interpreter_delay = 0.05
     controller_delay = .05
 
-    GS_sensor = rossros.Producer(sensor.producer_sensor, sensor_bus, delay=sensor_delay)
-    GS_interpreter = rossros.ConsumerProducer(interpreter, sensor_bus, interpreter_bus, delay=interpreter_delay)
+    GS_sensor = rossros.Producer(sensor.read_sensor, sensor_bus, delay=sensor_delay)
+    GS_interpreter = rossros.ConsumerProducer(interpreter.producer_consumer, sensor_bus, interpreter_bus, delay=interpreter_delay)
     GS_controller = rossros.Consumer(controller.consumer, interpreter_bus, delay=controller_delay)
     rossros.runConcurrently([GS_sensor, GS_interpreter, GS_controller])
 
