@@ -98,9 +98,9 @@ if __name__=='__main__':
     us_sensor_bus = rossros.Bus(0.0, 'US_sensor_bus')
 
     # Delay
-    sensor_delay = 0.05
-    interpreter_delay = 0.05
-    controller_delay = .05
+    sensor_delay = 0.02
+    interpreter_delay = 0.02
+    controller_delay = .02
 
     GS_sensor = rossros.Producer(gs_sensor.read_sensor, gs_sensor_bus, delay=sensor_delay)
     GS_interpreter = rossros.ConsumerProducer(interpreter.producer_consumer, gs_sensor_bus, gs_interpreter_bus, delay=interpreter_delay)
