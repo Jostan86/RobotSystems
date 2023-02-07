@@ -1,6 +1,8 @@
 
 from picarx_improved import Picarx
 from time import sleep
+import concurrent.futures
+from readerwriterlock import rwlock
 
 class GS_Line_Follow_Interpereter:
     def __init__(self, sensitivity=300, line_darker=True):
@@ -43,11 +45,19 @@ class GS_Line_Follow_Interpereter:
         steering_scale = diff_right + diff_left
         return steering_scale
 
+    def producer_consumer(self, sensor_bus, interpreter_bus, delay_time):
+        while True:
+            sensor_msg = sensor_bus.read()
+            interpreter_msg = self.get_direction(sensor_msg)
+            interpreter_bus.write(interpreter_msg)
+            sleep(delay_time)
+
 class Line_Follow_Controller:
     def __init__(self, px, interpreter, sensor):
         self.px = px
         self.interpreter = interpreter
         self.sensor = sensor
+
     def follow_line(self):
         try:
             while True:
@@ -62,20 +72,61 @@ class Line_Follow_Controller:
         finally:
             px.stop()
 
+    def consumer(self, interpreter_bus, delay_time):
+        try:
+            while True:
+                interpreter_msg = interpreter_bus.read()
+                if interpreter_msg is None:
+                    self.px.stop()
+                else:
+                    px.set_dir_servo_angle(25 * interpreter_msg)
+                    px.forward(40)
+
+                sleep(delay_time)
+        finally:
+            px.stop()
+
 class GS_sensor:
     def __init__(self, px):
         self.px = px
+
     def read_sensor(self):
         return px.get_grayscale_data()
 
+    def producer_sensor(self, sensor_bus, delay_time):
+        while True:
+            sensor_bus.write(self.read_sensor())
+            sleep(delay_time)
 
+
+class bus_struct:
+    def __init__(self):
+        self.message = None
+        self.lock = rwlock.RWLockWriteD()
+
+    def write(self, message):
+        with self.lock.gen_wlock():
+            self.message = message
+
+    def read(self):
+        with self.lock.gen_rlock():
+            message = self.message
+        return message
 
 if __name__=='__main__':
     px = Picarx()
     interpreter = GS_Line_Follow_Interpereter()
     sensor = GS_sensor(px)
     controller = Line_Follow_Controller(px, interpreter, sensor)
-    controller.follow_line()
+    sensor_bus = bus_struct()
+    interpreter_bus = bus_struct()
+    sensor_delay = 0.05
+    interpreter_delay = sensor_delay
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+        eSensor = executor.submit(sensor.producer_sensor, sensor_bus, sensor_delay)
+        eInterpreter = executor.submit(interpreter.producer_consumer, sensor_bus, interpreter_bus, interpreter_delay)
+
 
 
 
