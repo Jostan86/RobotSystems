@@ -73,18 +73,17 @@ class Line_Follow_Controller:
             px.stop()
 
     def consumer(self, interpreter_bus, delay_time):
-        try:
-            while True:
-                interpreter_msg = interpreter_bus.read()
-                if interpreter_msg is None:
-                    self.px.stop()
-                else:
-                    px.set_dir_servo_angle(25 * interpreter_msg)
-                    px.forward(40)
 
-                sleep(delay_time)
-        finally:
-            px.stop()
+        while True:
+            interpreter_msg = interpreter_bus.read()
+            if interpreter_msg is None:
+                self.px.stop()
+            else:
+                px.set_dir_servo_angle(25 * interpreter_msg)
+                px.forward(40)
+
+            sleep(delay_time)
+
 
 class GS_sensor:
     def __init__(self, px):
@@ -126,7 +125,7 @@ if __name__=='__main__':
     controller_delay = .05
 
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
         eSensor = executor.submit(sensor.producer_sensor, sensor_bus, sensor_delay)
         eInterpreter = executor.submit(interpreter.producer_consumer, sensor_bus, interpreter_bus, interpreter_delay)
         eController = executor.submit(controller.consumer, interpreter_bus, controller_delay)
