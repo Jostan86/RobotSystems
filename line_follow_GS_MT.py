@@ -122,11 +122,14 @@ if __name__=='__main__':
     interpreter_bus = bus_struct()
     # Delay
     sensor_delay = 0.05
-    interpreter_delay = sensor_delay
+    interpreter_delay = 0.05
+    controller_delay = .05
+
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
         eSensor = executor.submit(sensor.producer_sensor, sensor_bus, sensor_delay)
         eInterpreter = executor.submit(interpreter.producer_consumer, sensor_bus, interpreter_bus, interpreter_delay)
+        eController = executor.submit(controller.consumer, interpreter_bus, controller_delay)
 
 
 
