@@ -50,7 +50,7 @@ class GS_Line_Follow_Interpereter:
 
     def producer_consumer(self, sensor_bus):
 
-        sensor_msg = sensor_bus[0]
+        sensor_msg = sensor_bus
         interpreter_msg = self.get_direction(sensor_msg)
         return interpreter_msg
 
@@ -76,7 +76,7 @@ class Line_Follow_Controller:
 
     def consumer(self, interpreter_bus):
 
-        interpreter_msg = interpreter_bus[0]
+        interpreter_msg = interpreter_bus
         if interpreter_msg is None:
             self.px.stop()
         else:
@@ -91,25 +91,8 @@ class GS_sensor:
     def read_sensor(self):
         return px.get_grayscale_data()
 
-    # def producer_sensor(self, sensor_bus, delay_time):
-    #
-    #         sensor_bus.write(self.read_sensor())
-    #         sleep(delay_time)
 
 
-class bus_struct:
-    def __init__(self):
-        self.message = None
-        self.lock = rwlock.RWLockWriteD()
-
-    def write(self, message):
-        with self.lock.gen_wlock():
-            self.message = message
-
-    def read(self):
-        with self.lock.gen_rlock():
-            message = self.message
-        return message
 
 if __name__=='__main__':
     px = Picarx()
