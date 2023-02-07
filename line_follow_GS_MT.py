@@ -120,6 +120,7 @@ if __name__=='__main__':
     controller = Line_Follow_Controller(px, interpreter, sensor)
     sensor_bus = bus_struct()
     interpreter_bus = bus_struct()
+    # Delay
     sensor_delay = 0.05
     interpreter_delay = sensor_delay
 
