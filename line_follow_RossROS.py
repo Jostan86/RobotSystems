@@ -1,10 +1,8 @@
 
 from picarx_improved import Picarx
 from time import sleep
-import concurrent.futures
-from readerwriterlock import rwlock
 import rossros
-
+import math
 class GS_Line_Follow_Interpereter:
     def __init__(self, sensitivity=300, line_darker=True):
         # Car will stop if difference between both sensors sets is less than this
@@ -14,17 +12,11 @@ class GS_Line_Follow_Interpereter:
             self.polarity = 1
         else:
             self.polarity = -1
-    def stop_check (self, sensor_reading):
-        """Stop the car if it doesn't see any difference in the readings"""
-        if abs(sensor_reading[0] - sensor_reading[1]) < self.stop_threshold and abs(sensor_reading[2] - sensor_reading[1]) < self.stop_threshold:
-            return True
-        else:
-            return False
 
     def get_direction(self, sensor_readings):
         """Find the steering angle using the sensor"""
         if abs(sensor_readings[0] - sensor_readings[1]) < self.stop_threshold and abs(sensor_readings[2] - sensor_readings[1]) < self.stop_threshold:
-            return None
+            return 10
 
         # Set max range as the max reading
         range_max = max(sensor_readings)
@@ -55,29 +47,13 @@ class GS_Line_Follow_Interpereter:
         return interpreter_msg
 
 class Line_Follow_Controller:
-    def __init__(self, px, interpreter, sensor):
+    def __init__(self, px):
         self.px = px
-        self.interpreter = interpreter
-        self.sensor = sensor
-
-    def follow_line(self):
-        try:
-            while True:
-                sensor_readings = sensor.read_sensor()
-                if self.interpreter.stop_check(sensor_readings):
-                    self.px.stop()
-                else:
-                    px.set_dir_servo_angle(25 * self.interpreter.get_direction(sensor_readings))
-                    px.forward(40)
-
-                sleep(.01)
-        finally:
-            px.stop()
 
     def consumer(self, interpreter_bus):
 
         interpreter_msg = interpreter_bus
-        if interpreter_msg is None:
+        if math.isclose(10, interpreter_msg):
             self.px.stop()
         else:
             px.set_dir_servo_angle(25 * interpreter_msg)
@@ -98,17 +74,17 @@ if __name__=='__main__':
     px = Picarx()
     interpreter = GS_Line_Follow_Interpereter()
     sensor = GS_sensor(px)
-    controller = Line_Follow_Controller(px, interpreter, sensor)
-    sensor_bus = rossros.Bus()
-    interpreter_bus = rossros.Bus()
+    controller = Line_Follow_Controller(px)
+    sensor_bus_ros = rossros.Bus()
+    interpreter_bus_ros = rossros.Bus()
     # Delay
     sensor_delay = 0.05
     interpreter_delay = 0.05
     controller_delay = .05
 
-    GS_sensor = rossros.Producer(sensor.read_sensor, sensor_bus, delay=sensor_delay)
-    GS_interpreter = rossros.ConsumerProducer(interpreter.producer_consumer, sensor_bus, interpreter_bus, delay=interpreter_delay)
-    GS_controller = rossros.Consumer(controller.consumer, interpreter_bus, delay=controller_delay)
+    GS_sensor = rossros.Producer(sensor.read_sensor, sensor_bus_ros, delay=sensor_delay)
+    GS_interpreter = rossros.ConsumerProducer(interpreter.producer_consumer, sensor_bus_ros, interpreter_bus_ros, delay=interpreter_delay)
+    GS_controller = rossros.Consumer(controller.consumer, interpreter_bus_ros, delay=controller_delay)
     rossros.runConcurrently([GS_sensor, GS_interpreter, GS_controller])
 
     # with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
