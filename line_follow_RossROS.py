@@ -3,7 +3,7 @@ from picarx_improved import Picarx
 from time import sleep
 import rossros
 import math
-class GS_Line_Follow_Interpereter:
+class GS_Interpereter:
     def __init__(self, sensitivity=300, line_darker=True):
         # Car will stop if difference between both sensors sets is less than this
         self.stop_threshold = 70
@@ -46,7 +46,7 @@ class GS_Line_Follow_Interpereter:
         interpreter_msg = self.get_direction(sensor_msg)
         return interpreter_msg
 
-class Line_Follow_Controller:
+class GS_Controller:
     def __init__(self, px):
         self.px = px
 
@@ -60,27 +60,28 @@ class Line_Follow_Controller:
             px.forward(40)
 
 
-class GS_sensor:
+class GS_Sensor:
     def __init__(self, px):
         self.px = px
 
     def read_sensor(self):
         return px.get_grayscale_data()
 
-class US_sensor:
+class US_Sensor:
     def __init__(self, px):
         self.px = px
 
-    def read_US_sensor(self):
+    def read_sensor(self):
         return px.get_distance()
 
-class US_controller:
-    def __init__(self, stop_treshold=8):
+class US_Controller:
+    def __init__(self, px, stop_treshold=8):
+        self.px = px
         self.stop_threshold = stop_treshold
 
-    def US_controller(self, distance):
+    def controller(self, distance):
         if distance > self.stop_threshold:
-            px.stop()
+            self.px.stop()
 
 
 
@@ -88,24 +89,29 @@ class US_controller:
 
 if __name__=='__main__':
     px = Picarx()
-    interpreter = GS_Line_Follow_Interpereter()
-    gs_sensor = GS_sensor(px)
-    gs_controller = Line_Follow_Controller(px)
+    interpreter = GS_Interpereter()
+    gs_sensor = GS_Sensor(px)
+    gs_controller = GS_Controller(px)
     gs_sensor_bus = rossros.Bus([0,0,0], 'GS_sensor_bus')
     gs_interpreter_bus = rossros.Bus(0, 'GS_interpreter_bus')
-    us_sensor = US_sensor(px)
-    us_controller = US_controller(px)
+    us_sensor = US_Sensor(px)
+    us_controller = US_Controller(px)
     us_sensor_bus = rossros.Bus(0.0, 'US_sensor_bus')
 
     # Delay
     sensor_delay = 0.02
     interpreter_delay = 0.02
-    controller_delay = .02
+    controller_delay = 0.02
 
-    GS_sensor = rossros.Producer(gs_sensor.read_sensor, gs_sensor_bus, delay=sensor_delay)
-    GS_interpreter = rossros.ConsumerProducer(interpreter.producer_consumer, gs_sensor_bus, gs_interpreter_bus, delay=interpreter_delay)
-    GS_controller = rossros.Consumer(gs_controller.consumer, gs_interpreter_bus, delay=controller_delay)
-    rossros.runConcurrently([GS_sensor, GS_interpreter, GS_controller])
+    GS_sensor_CP = rossros.Producer(gs_sensor.read_sensor, gs_sensor_bus, delay=sensor_delay)
+    GS_interpreter_CP = rossros.ConsumerProducer(interpreter.producer_consumer, gs_sensor_bus, gs_interpreter_bus, delay=interpreter_delay)
+    GS_controller_CP = rossros.Consumer(gs_controller.consumer, gs_interpreter_bus, delay=controller_delay)
+
+    US_controller_CP = rossros.Consumer(us_controller.controller, us_sensor_bus, delay=controller_delay)
+    US_sensor_CP = rossros.Producer(us_sensor.read_sensor, us_sensor_bus, delay=sensor_delay)
+
+
+    rossros.runConcurrently([GS_sensor_CP, GS_interpreter_CP, GS_controller_CP, US_controller_CP, US_sensor_CP])
 
     # with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
     #     eSensor = executor.submit(sensor.producer_sensor, sensor_bus, sensor_delay)
