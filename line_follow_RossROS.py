@@ -43,6 +43,7 @@ class GS_Line_Follow_Interpereter:
     def producer_consumer(self, sensor_bus):
 
         sensor_msg = sensor_bus
+        print(sensor_msg)
         interpreter_msg = self.get_direction(sensor_msg)
         return interpreter_msg
 
@@ -52,7 +53,7 @@ class Line_Follow_Controller:
 
     def consumer(self, interpreter_bus):
 
-        interpreter_msg = interpreter_bus
+        interpreter_msg = interpreter_bus[0]
         if math.isclose(10, interpreter_msg):
             self.px.stop()
         else:
