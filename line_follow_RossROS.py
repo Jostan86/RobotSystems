@@ -43,7 +43,6 @@ class GS_Line_Follow_Interpereter:
     def producer_consumer(self, sensor_bus):
 
         sensor_msg = sensor_bus
-        print(sensor_msg)
         interpreter_msg = self.get_direction(sensor_msg)
         return interpreter_msg
 
@@ -53,7 +52,7 @@ class Line_Follow_Controller:
 
     def consumer(self, interpreter_bus):
 
-        interpreter_msg = interpreter_bus[0]
+        interpreter_msg = interpreter_bus
         if math.isclose(10, interpreter_msg):
             self.px.stop()
         else:
@@ -76,8 +75,8 @@ if __name__=='__main__':
     interpreter = GS_Line_Follow_Interpereter()
     sensor = GS_sensor(px)
     controller = Line_Follow_Controller(px)
-    sensor_bus_ros = rossros.Bus()
-    interpreter_bus_ros = rossros.Bus()
+    sensor_bus_ros = rossros.Bus([0,0,0], 'GS_sensor_bus')
+    interpreter_bus_ros = rossros.Bus(0, 'GS_interpreter_bus')
     # Delay
     sensor_delay = 0.05
     interpreter_delay = 0.05
