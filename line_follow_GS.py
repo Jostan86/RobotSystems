@@ -20,6 +20,8 @@ class GS_Line_Follow_Interpereter:
 
     def get_direction(self, sensor_readings):
         """Find the steering angle using the sensor"""
+        if abs(sensor_readings[0] - sensor_readings[1]) < self.stop_threshold and abs(sensor_readings[2] - sensor_readings[1]) < self.stop_threshold:
+            return None
 
         # Set max range as the max reading
         range_max = max(sensor_readings)
