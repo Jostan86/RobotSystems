@@ -22,7 +22,7 @@ class GS_Line_Follow_Interpereter:
 
     def get_direction(self, sensor_readings):
         """Find the steering angle using the sensor"""
-        if abs(sensor_readings[0] - sensor_readings[1]) < self.stop_threshold and abs(sensor_readings[2] - sensor_readings[1]) < self.stop_threshold:
+        if self.stop_check(sensor_readings):
             return None
 
         # Set max range as the max reading
@@ -60,20 +60,6 @@ class Line_Follow_Controller:
         self.interpreter = interpreter
         self.sensor = sensor
 
-    def follow_line(self):
-        try:
-            while True:
-                sensor_readings = sensor.read_sensor()
-                if self.interpreter.stop_check(sensor_readings):
-                    self.px.stop()
-                else:
-                    px.set_dir_servo_angle(25 * self.interpreter.get_direction(sensor_readings))
-                    px.forward(40)
-
-                sleep(.01)
-        finally:
-            px.stop()
-
     def consumer(self, interpreter_bus, delay_time):
 
         while True:
@@ -86,7 +72,6 @@ class Line_Follow_Controller:
 
             sleep(delay_time)
 
-
 class GS_sensor:
     def __init__(self, px):
         self.px = px
@@ -98,7 +83,6 @@ class GS_sensor:
         while True:
             sensor_bus.write(self.read_sensor())
             sleep(delay_time)
-
 
 class bus_struct:
     def __init__(self):
@@ -114,6 +98,7 @@ class bus_struct:
             message = self.message
         return message
 
+
 if __name__=='__main__':
     px = Picarx()
     interpreter = GS_Line_Follow_Interpereter()
@@ -121,16 +106,20 @@ if __name__=='__main__':
     controller = Line_Follow_Controller(px, interpreter, sensor)
     sensor_bus = bus_struct()
     interpreter_bus = bus_struct()
-    # Delay
+
+    # Delays
     sensor_delay = 0.05
     interpreter_delay = 0.05
-    controller_delay = .05
+    controller_delay = 0.05
 
+    input("Press enter to begin")
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
         eSensor = executor.submit(sensor.producer_sensor, sensor_bus, sensor_delay)
         eInterpreter = executor.submit(interpreter.producer_consumer, sensor_bus, interpreter_bus, interpreter_delay)
         eController = executor.submit(controller.consumer, interpreter_bus, controller_delay)
+
+
 
 
 
