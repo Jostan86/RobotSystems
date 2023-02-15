@@ -77,7 +77,7 @@ class Picarx(object):
         # usage: distance = self.ultrasonic.read()
         tring, echo= ultrasonic_pins
         self.ultrasonic = Ultrasonic(Pin(tring), Pin(echo))
-        # atexit.register(self.stop)
+        atexit.register(self.stop)
 
     def set_motor_speed(self,motor,speed):
         # global cali_speed_value,cali_dir_value
