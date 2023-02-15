@@ -3,6 +3,7 @@ import logging
 # from logdecorator import log_on_start , log_on_end , log_on_error
 import os
 import time
+import atexit
 
 try :
     from robot_hat import *
@@ -76,6 +77,7 @@ class Picarx(object):
         # usage: distance = self.ultrasonic.read()
         tring, echo= ultrasonic_pins
         self.ultrasonic = Ultrasonic(Pin(tring), Pin(echo))
+        atexit.register(self.stop)
 
     def set_motor_speed(self,motor,speed):
         # global cali_speed_value,cali_dir_value
