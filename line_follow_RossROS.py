@@ -103,22 +103,22 @@ if __name__=='__main__':
     sensor_delay = 0.02
     interpreter_delay = 0.02
     controller_delay = 0.02
-
+    
     px = Picarx()
     interpreter = GS_Interpereter()
     gs_sensor = GS_Sensor(px)
     gs_controller = GS_Controller(px)
+    us_sensor = US_Sensor(px)
+    
     gs_sensor_bus = rossros.Bus([0, 0, 0], 'GS_sensor_bus')
     gs_interpreter_bus = rossros.Bus(0, 'GS_interpreter_bus')
-    us_sensor = US_Sensor(px)
-    us_controller = US_Controller(px)
     us_sensor_bus = rossros.Bus(0.0, 'US_sensor_bus')
-    us_termination_bus = rossros.Bus(False, 'US_termination_bus')
+
 
     while True:
-
-
-
+        
+        us_termination_bus = rossros.Bus(False, 'US_termination_bus')
+        us_controller = US_Controller(px)
 
         GS_sensor_CP = rossros.Producer(gs_sensor.read_sensor, gs_sensor_bus, termination_buses=us_termination_bus,
                                         delay=sensor_delay)
