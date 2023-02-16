@@ -120,7 +120,7 @@ if __name__=='__main__':
         us_termination_bus = rossros.Bus(False, 'US_termination_bus')
         time_termination_bus = rossros.Bus(False, 'timer_bus')
         us_controller = US_Controller(px)
-        term_busses = [us_termination_bus, time_termination_bus]
+        term_busses = (us_termination_bus, time_termination_bus)
 
 
         GS_sensor_CP = rossros.Producer(gs_sensor.read_sensor, gs_sensor_bus, termination_buses=term_busses,
