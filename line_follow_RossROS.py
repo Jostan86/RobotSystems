@@ -80,7 +80,7 @@ class US_Controller:
         self.stop_threshold = stop_treshold
 
     def controller(self, distance):
-
+        print(distance)
         return True if distance < self.stop_threshold else False
 
 
