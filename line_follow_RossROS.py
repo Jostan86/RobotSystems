@@ -78,11 +78,19 @@ class US_Controller:
     def __init__(self, px, stop_treshold=8):
         self.px = px
         self.stop_threshold = stop_treshold
+        self.prev_readings = [False, False, False, False]
 
     def controller(self, distance):
-        # print(distance)
-        # return True if distance < self.stop_threshold else False
-        return False
+        self.prev_readings = self.prev_readings[1:]
+        if distance < self.stop_threshold:
+            self.prev_readings.append(True)
+        else:
+            self.prev_readings.append(False)
+
+        if all(self.prev_readings):
+            return True
+        else:
+            return False
 
 
 # class
