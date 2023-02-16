@@ -99,36 +99,63 @@ class US_Controller:
 
 
 if __name__=='__main__':
-    px = Picarx()
-    interpreter = GS_Interpereter()
-    gs_sensor = GS_Sensor(px)
-    gs_controller = GS_Controller(px)
-    gs_sensor_bus = rossros.Bus([0,0,0], 'GS_sensor_bus')
-    gs_interpreter_bus = rossros.Bus(0, 'GS_interpreter_bus')
-    us_sensor = US_Sensor(px)
-    us_controller = US_Controller(px)
-    us_sensor_bus = rossros.Bus(0.0, 'US_sensor_bus')
-    us_termination_bus = rossros.Bus(False, 'US_termination_bus')
-
-
-    # Delay
-    sensor_delay = 0.02
-    interpreter_delay = 0.02
-    controller_delay = 0.02
-
-    GS_sensor_CP = rossros.Producer(gs_sensor.read_sensor, gs_sensor_bus, termination_buses=us_termination_bus, delay=sensor_delay)
-    GS_interpreter_CP = rossros.ConsumerProducer(interpreter.producer_consumer, gs_sensor_bus, gs_interpreter_bus, termination_buses=us_termination_bus, delay=interpreter_delay)
-    GS_controller_CP = rossros.Consumer(gs_controller.consumer, gs_interpreter_bus, termination_buses=us_termination_bus, delay=controller_delay)
-
-    US_controller_CP = rossros.ConsumerProducer(us_controller.controller, us_sensor_bus, us_termination_bus, termination_buses=us_termination_bus, delay=controller_delay)
-    US_sensor_CP = rossros.Producer(us_sensor.read_sensor, us_sensor_bus, termination_buses=us_termination_bus, delay=0.2)
+    # px = Picarx()
+    # interpreter = GS_Interpereter()
+    # gs_sensor = GS_Sensor(px)
+    # gs_controller = GS_Controller(px)
+    # gs_sensor_bus = rossros.Bus([0,0,0], 'GS_sensor_bus')
+    # gs_interpreter_bus = rossros.Bus(0, 'GS_interpreter_bus')
+    # us_sensor = US_Sensor(px)
+    # us_controller = US_Controller(px)
+    # us_sensor_bus = rossros.Bus(0.0, 'US_sensor_bus')
+    # us_termination_bus = rossros.Bus(False, 'US_termination_bus')
+    #
+    #
+    # # Delay
+    # sensor_delay = 0.02
+    # interpreter_delay = 0.02
+    # controller_delay = 0.02
+    #
+    # GS_sensor_CP = rossros.Producer(gs_sensor.read_sensor, gs_sensor_bus, termination_buses=us_termination_bus, delay=sensor_delay)
+    # GS_interpreter_CP = rossros.ConsumerProducer(interpreter.producer_consumer, gs_sensor_bus, gs_interpreter_bus, termination_buses=us_termination_bus, delay=interpreter_delay)
+    # GS_controller_CP = rossros.Consumer(gs_controller.consumer, gs_interpreter_bus, termination_buses=us_termination_bus, delay=controller_delay)
+    #
+    # US_controller_CP = rossros.ConsumerProducer(us_controller.controller, us_sensor_bus, us_termination_bus, termination_buses=us_termination_bus, delay=controller_delay)
+    # US_sensor_CP = rossros.Producer(us_sensor.read_sensor, us_sensor_bus, termination_buses=us_termination_bus, delay=0.2)
 
     while True:
+        px = Picarx()
+        interpreter = GS_Interpereter()
+        gs_sensor = GS_Sensor(px)
+        gs_controller = GS_Controller(px)
+        gs_sensor_bus = rossros.Bus([0, 0, 0], 'GS_sensor_bus')
+        gs_interpreter_bus = rossros.Bus(0, 'GS_interpreter_bus')
+        us_sensor = US_Sensor(px)
+        us_controller = US_Controller(px)
+        us_sensor_bus = rossros.Bus(0.0, 'US_sensor_bus')
+        us_termination_bus = rossros.Bus(False, 'US_termination_bus')
+
+        # Delay
+        sensor_delay = 0.02
+        interpreter_delay = 0.02
+        controller_delay = 0.02
+
+        GS_sensor_CP = rossros.Producer(gs_sensor.read_sensor, gs_sensor_bus, termination_buses=us_termination_bus,
+                                        delay=sensor_delay)
+        GS_interpreter_CP = rossros.ConsumerProducer(interpreter.producer_consumer, gs_sensor_bus, gs_interpreter_bus,
+                                                     termination_buses=us_termination_bus, delay=interpreter_delay)
+        GS_controller_CP = rossros.Consumer(gs_controller.consumer, gs_interpreter_bus,
+                                            termination_buses=us_termination_bus, delay=controller_delay)
+
+        US_controller_CP = rossros.ConsumerProducer(us_controller.controller, us_sensor_bus, us_termination_bus,
+                                                    termination_buses=us_termination_bus, delay=controller_delay)
+        US_sensor_CP = rossros.Producer(us_sensor.read_sensor, us_sensor_bus, termination_buses=us_termination_bus,
+                                        delay=0.2)
         rossros.runConcurrently([GS_sensor_CP, GS_interpreter_CP, GS_controller_CP, US_controller_CP, US_sensor_CP])
         px.stop()
         # time.sleep(1)
-        us_controller.prev_readings = [False, False, False]
-        us_termination_bus = rossros.Bus(False, 'US_termination_bus')
+        # us_controller.prev_readings = [False, False, False]
+        # us_termination_bus = rossros.Bus(False, 'US_termination_bus')
 
         msg = input('Press enter to restart line following, or type stop to end program: ')
         if msg == 'stop':
