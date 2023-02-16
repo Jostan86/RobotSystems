@@ -1,3 +1,4 @@
+import time
 
 from picarx_improved import Picarx
 from time import sleep
@@ -123,11 +124,13 @@ if __name__=='__main__':
     US_sensor_CP = rossros.Producer(us_sensor.read_sensor, us_sensor_bus, termination_buses=us_termination_bus, delay=0.2)
 
     active = True
-    while active:
+    while True:
         rossros.runConcurrently([GS_sensor_CP, GS_interpreter_CP, GS_controller_CP, US_controller_CP, US_sensor_CP])
+        time.sleep(2)
+
         msg = input('Press enter to restart line following, or stop to end program')
         if msg == 'stop':
-            active = False
+            break
 
     # with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
     #     eSensor = executor.submit(sensor.producer_sensor, sensor_bus, sensor_delay)
