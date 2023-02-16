@@ -120,7 +120,7 @@ if __name__=='__main__':
     GS_controller_CP = rossros.Consumer(gs_controller.consumer, gs_interpreter_bus, termination_buses=us_termination_bus, delay=controller_delay)
 
     US_controller_CP = rossros.ConsumerProducer(us_controller.controller, us_sensor_bus, us_termination_bus, termination_buses=us_termination_bus, delay=controller_delay)
-    US_sensor_CP = rossros.Producer(us_sensor.read_sensor, us_sensor_bus, termination_buses=us_termination_bus, delay=0.1)
+    US_sensor_CP = rossros.Producer(us_sensor.read_sensor, us_sensor_bus, termination_buses=us_termination_bus, delay=0.2)
 
 
 
