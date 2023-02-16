@@ -122,9 +122,12 @@ if __name__=='__main__':
     US_controller_CP = rossros.ConsumerProducer(us_controller.controller, us_sensor_bus, us_termination_bus, termination_buses=us_termination_bus, delay=controller_delay)
     US_sensor_CP = rossros.Producer(us_sensor.read_sensor, us_sensor_bus, termination_buses=us_termination_bus, delay=0.2)
 
-
-
-    rossros.runConcurrently([GS_sensor_CP, GS_interpreter_CP, GS_controller_CP, US_controller_CP, US_sensor_CP])
+    active = True
+    while active:
+        rossros.runConcurrently([GS_sensor_CP, GS_interpreter_CP, GS_controller_CP, US_controller_CP, US_sensor_CP])
+        msg = input('Press enter to restart line following, or stop to end program')
+        if msg == 'stop':
+            active = False
 
     # with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
     #     eSensor = executor.submit(sensor.producer_sensor, sensor_bus, sensor_delay)
