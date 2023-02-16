@@ -126,9 +126,11 @@ if __name__=='__main__':
     active = True
     while True:
         rossros.runConcurrently([GS_sensor_CP, GS_interpreter_CP, GS_controller_CP, US_controller_CP, US_sensor_CP])
-        time.sleep(2)
+        px.stop()
+        # time.sleep(1)
+        us_controller.prev_readings = [False, False, False]
 
-        msg = input('Press enter to restart line following, or stop to end program')
+        msg = input('Press enter to restart line following, or type stop to end program: ')
         if msg == 'stop':
             break
 
