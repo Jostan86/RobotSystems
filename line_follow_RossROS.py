@@ -118,20 +118,23 @@ if __name__=='__main__':
     while True:
         
         us_termination_bus = rossros.Bus(False, 'US_termination_bus')
+        time_termination_bus = rossros.Bus(False, 'timer_bus')
         us_controller = US_Controller(px)
+        term_busses = [us_termination_bus, time_termination_bus]
 
-        GS_sensor_CP = rossros.Producer(gs_sensor.read_sensor, gs_sensor_bus, termination_buses=us_termination_bus,
+        GS_sensor_CP = rossros.Producer(gs_sensor.read_sensor, gs_sensor_bus, termination_buses=term_busses,
                                         delay=sensor_delay)
         GS_interpreter_CP = rossros.ConsumerProducer(interpreter.producer_consumer, gs_sensor_bus, gs_interpreter_bus,
-                                                     termination_buses=us_termination_bus, delay=interpreter_delay)
+                                                     termination_buses=term_busses, delay=interpreter_delay)
         GS_controller_CP = rossros.Consumer(gs_controller.consumer, gs_interpreter_bus,
-                                            termination_buses=us_termination_bus, delay=controller_delay)
+                                            termination_buses=term_busses, delay=controller_delay)
 
-        US_controller_CP = rossros.ConsumerProducer(us_controller.controller, us_sensor_bus, us_termination_bus,
-                                                    termination_buses=us_termination_bus, delay=controller_delay)
-        US_sensor_CP = rossros.Producer(us_sensor.read_sensor, us_sensor_bus, termination_buses=us_termination_bus,
+        US_controller_CP = rossros.ConsumerProducer(us_controller.controller, us_sensor_bus, term_busses,
+                                                    termination_buses=term_busses, delay=controller_delay)
+        US_sensor_CP = rossros.Producer(us_sensor.read_sensor, us_sensor_bus, termination_buses=term_busses,
                                         delay=0.2)
 
+        timer = rossros.Timer(time_termination_bus, duration=3, )
         rossros.runConcurrently([GS_sensor_CP, GS_interpreter_CP, GS_controller_CP, US_controller_CP, US_sensor_CP])
         px.stop()
 
