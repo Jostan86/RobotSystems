@@ -75,10 +75,10 @@ class US_Sensor:
         return px.get_distance()
 
 class US_Controller:
-    def __init__(self, px, stop_treshold=8):
+    def __init__(self, px, stop_treshold=12):
         self.px = px
         self.stop_threshold = stop_treshold
-        self.prev_readings = [False, False, False, False]
+        self.prev_readings = [False, False, False]
 
     def controller(self, distance):
         self.prev_readings = self.prev_readings[1:]
@@ -120,7 +120,7 @@ if __name__=='__main__':
     GS_controller_CP = rossros.Consumer(gs_controller.consumer, gs_interpreter_bus, termination_buses=us_termination_bus, delay=controller_delay)
 
     US_controller_CP = rossros.ConsumerProducer(us_controller.controller, us_sensor_bus, us_termination_bus, termination_buses=us_termination_bus, delay=controller_delay)
-    US_sensor_CP = rossros.Producer(us_sensor.read_sensor, us_sensor_bus, termination_buses=us_termination_bus, delay=0.2)
+    US_sensor_CP = rossros.Producer(us_sensor.read_sensor, us_sensor_bus, termination_buses=us_termination_bus, delay=0.1)
 
 
 
