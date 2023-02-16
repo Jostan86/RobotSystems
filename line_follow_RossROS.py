@@ -136,7 +136,7 @@ if __name__=='__main__':
                                         delay=0.2)
 
         timer = rossros.Timer(time_termination_bus, duration=3)
-        rossros.runConcurrently([GS_sensor_CP, GS_interpreter_CP, GS_controller_CP, US_controller_CP, US_sensor_CP, timer])
+        rossros.runConcurrently([GS_sensor_CP, GS_interpreter_CP, GS_controller_CP, US_controller_CP, US_sensor_CP])
         px.stop()
 
 
