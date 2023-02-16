@@ -121,7 +121,7 @@ if __name__=='__main__':
         time_termination_bus = rossros.Bus(False, 'timer_bus')
         us_controller = US_Controller(px)
         term_busses = [us_termination_bus, time_termination_bus]
-        term_busses = us_termination_bus
+
 
         GS_sensor_CP = rossros.Producer(gs_sensor.read_sensor, gs_sensor_bus, termination_buses=term_busses,
                                         delay=sensor_delay)
@@ -135,8 +135,8 @@ if __name__=='__main__':
         US_sensor_CP = rossros.Producer(us_sensor.read_sensor, us_sensor_bus, termination_buses=term_busses,
                                         delay=0.2)
 
-        timer = rossros.Timer(time_termination_bus, duration=3)
-        rossros.runConcurrently([GS_sensor_CP, GS_interpreter_CP, GS_controller_CP, US_controller_CP, US_sensor_CP])
+        timer = rossros.Timer(time_termination_bus, duration=3, termination_buses=term_busses)
+        rossros.runConcurrently([GS_sensor_CP, GS_interpreter_CP, GS_controller_CP, US_controller_CP, US_sensor_CP, timer])
         px.stop()
 
 
