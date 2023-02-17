@@ -4,6 +4,7 @@ from picarx_improved import Picarx
 from time import sleep
 import rossros
 import math
+
 class GS_Interpereter:
     def __init__(self, sensitivity=300, line_darker=True):
         # Car will stop if difference between both sensors sets is less than this
@@ -16,6 +17,8 @@ class GS_Interpereter:
 
     def get_direction(self, sensor_readings):
         """Find the steering angle using the sensor"""
+
+        # Check if all three sensor reading are similar, if so, return stop signal, which I'm using 10 for in this case
         if abs(sensor_readings[0] - sensor_readings[1]) < self.stop_threshold and abs(sensor_readings[2] - sensor_readings[1]) < self.stop_threshold:
             return 10
 
@@ -27,8 +30,8 @@ class GS_Interpereter:
         if range_min < 0:
             range_min = 0
 
-
         for sensor_num, sensor_reading in enumerate(sensor_readings):
+
             # If a reading is below the minimum, change it
             if sensor_reading < range_min:
                 sensor_readings[sensor_num] = range_min
@@ -39,10 +42,11 @@ class GS_Interpereter:
 
         # Calculate the steering scale on range of -1 - 1
         steering_scale = diff_right + diff_left
+
         return steering_scale
 
     def producer_consumer(self, sensor_bus):
-
+        """Takes the sensor reading in and returns the interpreter message"""
         sensor_msg = sensor_bus
         interpreter_msg = self.get_direction(sensor_msg)
         return interpreter_msg
@@ -52,7 +56,7 @@ class GS_Controller:
         self.px = px
 
     def consumer(self, interpreter_bus):
-
+        """Based on the greyscale interpreter value, sends a command to the car"""
         interpreter_msg = interpreter_bus
         if math.isclose(10, interpreter_msg):
             self.px.stop()
@@ -66,6 +70,7 @@ class GS_Sensor:
         self.px = px
 
     def read_sensor(self):
+        """Gets a greyscale sensor reading from the car and returns it"""
         return px.get_grayscale_data()
 
 class US_Sensor:
@@ -73,6 +78,7 @@ class US_Sensor:
         self.px = px
 
     def read_sensor(self):
+        """Gets the distance measurement from the car and returns it"""
         return px.get_distance()
 
 class US_Controller:
@@ -82,6 +88,8 @@ class US_Controller:
         self.prev_readings = [False, False, False]
 
     def controller(self, distance):
+        """Controller for the ultrasonic sensor, returns stop signal if three reading in a row are under the stop
+        distance threshold"""
         self.prev_readings = self.prev_readings[1:]
         if distance < self.stop_threshold:
             self.prev_readings.append(True)
@@ -94,15 +102,13 @@ class US_Controller:
             return False
 
 
-# class
-
-
-
 if __name__=='__main__':
     # Delay
     sensor_delay = 0.02
     interpreter_delay = 0.02
     controller_delay = 0.02
+    US_sensor_delay = 0.2
+    US_controller_delay = 0.2
     
     px = Picarx()
     interpreter = GS_Interpereter()
@@ -131,9 +137,9 @@ if __name__=='__main__':
                                             termination_buses=term_busses, delay=controller_delay)
 
         US_controller_CP = rossros.ConsumerProducer(us_controller.controller, us_sensor_bus, term_busses,
-                                                    termination_buses=term_busses, delay=controller_delay)
+                                                    termination_buses=term_busses, delay=US_controller_delay)
         US_sensor_CP = rossros.Producer(us_sensor.read_sensor, us_sensor_bus, termination_buses=term_busses,
-                                        delay=0.2)
+                                        delay=US_sensor_delay)
 
         timer = rossros.Timer(time_termination_bus, duration=3, termination_buses=term_busses)
         rossros.runConcurrently([GS_sensor_CP, GS_interpreter_CP, GS_controller_CP, US_controller_CP, US_sensor_CP, timer])
