@@ -141,7 +141,7 @@ if __name__=='__main__':
         US_sensor_CP = rossros.Producer(us_sensor.read_sensor, us_sensor_bus, termination_buses=term_busses,
                                         delay=US_sensor_delay)
 
-        timer = rossros.Timer(time_termination_bus, duration=3, termination_buses=term_busses)
+        timer = rossros.Timer(time_termination_bus, duration=20, termination_buses=term_busses)
         rossros.runConcurrently([GS_sensor_CP, GS_interpreter_CP, GS_controller_CP, US_controller_CP, US_sensor_CP, timer])
         px.stop()
 
