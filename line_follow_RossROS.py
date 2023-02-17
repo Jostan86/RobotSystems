@@ -107,8 +107,8 @@ if __name__=='__main__':
     sensor_delay = 0.02
     interpreter_delay = 0.02
     controller_delay = 0.02
-    US_sensor_delay = 0.2
-    US_controller_delay = 0.2
+    US_sensor_delay = 0.1
+    US_controller_delay = 0.1
     
     px = Picarx()
     interpreter = GS_Interpereter()
