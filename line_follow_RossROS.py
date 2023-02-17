@@ -85,7 +85,7 @@ class US_Controller:
     def __init__(self, px, stop_treshold=12):
         self.px = px
         self.stop_threshold = stop_treshold
-        self.prev_readings = [False, False, False]
+        self.prev_readings = [False, False]
 
     def controller(self, distance):
         """Controller for the ultrasonic sensor, returns stop signal if three reading in a row are under the stop
