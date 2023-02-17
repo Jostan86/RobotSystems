@@ -19,7 +19,8 @@ class GS_Interpereter:
         """Find the steering angle using the sensor"""
 
         # Check if all three sensor reading are similar, if so, return stop signal, which I'm using 10 for in this case
-        if abs(sensor_readings[0] - sensor_readings[1]) < self.stop_threshold and abs(sensor_readings[2] - sensor_readings[1]) < self.stop_threshold:
+        if abs(sensor_readings[0] - sensor_readings[1]) < self.stop_threshold and \
+                abs(sensor_readings[2] - sensor_readings[1]) < self.stop_threshold:
             return 10
 
         # Set max range as the max reading
@@ -88,7 +89,7 @@ class US_Controller:
         self.prev_readings = [False, False]
 
     def controller(self, distance):
-        """Controller for the ultrasonic sensor, returns stop signal if three reading in a row are under the stop
+        """Controller for the ultrasonic sensor, returns stop signal if two reading in a row are under the stop
         distance threshold"""
         self.prev_readings = self.prev_readings[1:]
         if distance < self.stop_threshold:
@@ -103,13 +104,17 @@ class US_Controller:
 
 
 if __name__=='__main__':
-    # Delay
+    # Delays
     sensor_delay = 0.02
     interpreter_delay = 0.02
     controller_delay = 0.02
     US_sensor_delay = 0.1
     US_controller_delay = 0.1
-    
+
+    # Set the auto shutoff time lenght
+    timer_length = 20
+
+    # Setup some of the interpreters and busses
     px = Picarx()
     interpreter = GS_Interpereter()
     gs_sensor = GS_Sensor(px)
@@ -120,12 +125,15 @@ if __name__=='__main__':
     gs_interpreter_bus = rossros.Bus(0, 'GS_interpreter_bus')
     us_sensor_bus = rossros.Bus(0.0, 'US_sensor_bus')
 
-
+    # While loop to allow the bot to restart line following after it detects and object, some of the buses and
+    # producer consumers had to be reset, others didn't have to be.
     while True:
-        
+
         us_termination_bus = rossros.Bus(False, 'US_termination_bus')
         time_termination_bus = rossros.Bus(False, 'timer_bus')
         us_controller = US_Controller(px)
+
+        # Termination busses, one for the timer, one for the ultrasonic sensor
         term_busses = (us_termination_bus, time_termination_bus)
 
 
@@ -141,12 +149,12 @@ if __name__=='__main__':
         US_sensor_CP = rossros.Producer(us_sensor.read_sensor, us_sensor_bus, termination_buses=term_busses,
                                         delay=US_sensor_delay)
 
-        timer = rossros.Timer(time_termination_bus, duration=20, termination_buses=term_busses)
+        timer = rossros.Timer(time_termination_bus, duration=timer_length, termination_buses=term_busses)
         rossros.runConcurrently([GS_sensor_CP, GS_interpreter_CP, GS_controller_CP, US_controller_CP, US_sensor_CP, timer])
         px.stop()
 
-
-        msg = input('Press enter to restart line following, or type stop to end program: ')
-        if msg == 'stop':
+        # Input to handle whether to continue program
+        msg = input('Press enter to restart line following, or type s to end program: ')
+        if msg == 's' or msg == 'S':
             break
 
